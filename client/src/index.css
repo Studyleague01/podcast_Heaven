@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Performance optimizations for GPU acceleration */
+  .optimize-gpu {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+    perspective: 1000;
+    -webkit-perspective: 1000;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+  }
+  
+  /* Performance optimizations for text rendering */
+  .optimize-text {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Memory optimization for animations */
+  .optimize-animation {
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
+    will-change: transform, opacity;
+  }
+  
+  .audio-player-shadow {
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Audio visualizer styles */
+  .audio-visualizer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 40px;
+    gap: 2px;
+  }
+  
+  .audio-bar {
+    width: 3px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 1px;
+    transition: height 0.2s ease;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.95; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  @keyframes pulse-large {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 hsl(15, 75%, 62%, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px hsl(15, 75%, 62%, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 hsl(15, 75%, 62%, 0); }
+  }
+  
+  .play-button-pulse {
+    animation: pulse 1.5s infinite ease-in-out;
+  }
+  
+  .play-button-pulse-large {
+    animation: pulse-large 2s infinite cubic-bezier(0.66, 0, 0, 1);
+  }
+  
+  /* Dark mode adjustments */
+  .dark .audio-player-shadow {
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dark .audio-bar {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+}
