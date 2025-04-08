@@ -236,28 +236,7 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
       <div className="container mx-auto px-4">
         {/* Personalized Greeting - Only show when not searching and user is authenticated - Simplified */}
         {!searchQuery && isAuthenticated && (
-          <div className="bg-gradient-to-r from-orange-500/10 to-orange-500/5 dark:from-orange-900/20 dark:to-zinc-900 p-5 rounded-xl mb-8 border border-orange-100/50 dark:border-zinc-800 shadow-md">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white shadow-md flex-shrink-0 mr-4">
-                <span className="material-icons text-xl">
-                  {greeting === 'Good morning' && 'wb_sunny'}
-                  {greeting === 'Good afternoon' && 'wb_twilight'}
-                  {greeting === 'Good evening' && 'nights_stay'}
-                  {greeting === 'Good night' && 'bedtime'}
-                </span>
-              </div>
-              <div>
-                <h2 className="text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100">
-                  {greeting}, <span className="text-orange-500 dark:text-orange-400">{user?.name || 'User'}</span>
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  {greeting === 'Good morning' && 'Start your day with inspiring podcasts'}
-                  {greeting === 'Good afternoon' && 'Taking a break? Find something new'}
-                  {greeting === 'Good evening' && 'Unwind with your favorites'}
-                  {greeting === 'Good night' && 'Something relaxing before bed?'}
-                </p>
-              </div>
-            </div>
+          <div className="mb-12" class="hide">
           </div>
         )}
 
