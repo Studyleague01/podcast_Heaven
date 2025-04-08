@@ -13,6 +13,7 @@ export interface Podcast {
   uploaded: number;
   uploaderAvatar: string | null;
   isShort: boolean;
+  thumbnailOptions?: string[]; // Optional array of alternative thumbnail URLs for fallback
 }
 
 export interface AudioStream {

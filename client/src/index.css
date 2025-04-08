@@ -10,6 +10,75 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+  
+  /* Light mode variables */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 20 95% 48%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 20 95% 55%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 20 95% 55%;
+    --radius: 0.75rem;
+    --accent-orange: 20, 95%, 50%;
+    --accent-hover: 20, 95%, 45%;
+  }
+  
+  /* Dark mode variables */
+  .dark {
+    --background: 0 0% 5%;
+    --foreground: 210 40% 98%;
+    --card: 0 0% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 20 95% 50%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 20 95% 55%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 20 95% 50%;
+    --accent-orange: 20, 95%, 50%;
+    --accent-hover: 20, 95%, 45%;
+  }
+  
+  /* Theme-specific highlight classes */
+  .accent-highlight {
+    @apply text-amber-600;
+  }
+  
+  .dark .accent-highlight {
+    @apply text-orange-500;
+  }
+  
+  /* Theme-specific interactive elements */
+  .accent-interactive {
+    @apply hover:text-amber-600 transition-colors duration-200;
+  }
+  
+  .dark .accent-interactive {
+    @apply hover:text-orange-500 transition-colors duration-200;
+  }
 }
 
 @layer utilities {
@@ -22,79 +91,137 @@
     display: none;
   }
   
-  /* Performance optimizations for GPU acceleration */
-  .optimize-gpu {
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    will-change: transform;
-    perspective: 1000;
-    -webkit-perspective: 1000;
-    transform-style: preserve-3d;
-    -webkit-transform-style: preserve-3d;
+  /* Basic smooth transitions */
+  .smooth-transition {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* Performance optimizations for text rendering */
-  .optimize-text {
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  /* Improve native HTML elements */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
   }
   
-  /* Memory optimization for animations */
-  .optimize-animation {
-    animation-fill-mode: forwards;
-    -webkit-animation-fill-mode: forwards;
-    will-change: transform, opacity;
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: hsl(var(--primary));
+    margin-top: -4px;
   }
   
-  .audio-player-shadow {
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  .dark input[type="range"]::-webkit-slider-thumb {
+    background: hsl(var(--accent-orange));
   }
   
-  /* Audio visualizer styles */
-  .audio-visualizer {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    height: 40px;
-    gap: 2px;
+  input[type="range"]::-moz-range-thumb {
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: hsl(var(--primary));
+    border: none;
   }
   
-  .audio-bar {
-    width: 3px;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 1px;
-    transition: height 0.2s ease;
+  .dark input[type="range"]::-moz-range-thumb {
+    background: hsl(var(--accent-orange));
   }
   
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.95; }
-    100% { transform: scale(1); opacity: 1; }
+  input[type="range"]::-webkit-slider-runnable-track {
+    background: hsl(var(--muted));
+    height: 4px;
+    border-radius: 2px;
   }
   
-  @keyframes pulse-large {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 hsl(15, 75%, 62%, 0.7); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px hsl(15, 75%, 62%, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 hsl(15, 75%, 62%, 0); }
+  input[type="range"]::-moz-range-track {
+    background: hsl(var(--muted));
+    height: 4px;
+    border-radius: 2px;
+  }
+  
+  /* Custom styling for progress element */
+  progress {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  progress::-webkit-progress-bar {
+    background-color: hsl(var(--muted));
+    border-radius: 2px;
+  }
+  
+  progress::-webkit-progress-value {
+    background-color: hsl(var(--primary));
+    border-radius: 2px;
+  }
+  
+  .dark progress::-webkit-progress-value {
+    background-color: hsl(var(--accent-orange));
+    border-radius: 2px;
+  }
+  
+  progress::-moz-progress-bar {
+    background-color: hsl(var(--primary));
+    border-radius: 2px;
+  }
+  
+  .dark progress::-moz-progress-bar {
+    background-color: hsl(var(--accent-orange));
+    border-radius: 2px;
+  }
+  
+  /* Simple smooth pulse animation */
+  @keyframes smooth-pulse {
+    0% { opacity: 0.9; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+    100% { opacity: 0.9; transform: scale(1); }
   }
   
   .play-button-pulse {
-    animation: pulse 1.5s infinite ease-in-out;
+    animation: smooth-pulse 2s infinite ease-in-out;
   }
   
-  .play-button-pulse-large {
-    animation: pulse-large 2s infinite cubic-bezier(0.66, 0, 0, 1);
+  /* Subtle background pulse for hero sections */
+  @keyframes subtle-pulse {
+    0% { opacity: 0.9; }
+    50% { opacity: 1; }
+    100% { opacity: 0.9; }
   }
   
-  /* Dark mode adjustments */
-  .dark .audio-player-shadow {
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  .animate-subtle-pulse {
+    animation: subtle-pulse 8s infinite ease-in-out;
   }
   
-  .dark .audio-bar {
-    background-color: rgba(255, 255, 255, 0.4);
+  /* Gentle bounce animation */
+  @keyframes gently-bounce {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-5px); }
+    50% { transform: translateY(0); }
+    75% { transform: translateY(-3px); }
+  }
+  
+  .animate-gently-bounce {
+    animation: gently-bounce 3s ease-in-out infinite;
+  }
+  
+  /* Shimmer effect for premium elements */
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.1), 
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite;
   }
 }

@@ -4,7 +4,7 @@ import { getFeaturedPodcasts, getNewestPodcasts, searchPodcasts, getAudioStream 
 import PodcastCard from "@/components/PodcastCard";
 import LoadingIndicator from "@/components/LoadingIndicator";
 import ErrorMessage from "@/components/ErrorMessage";
-import { useSearchStore } from "@/store/index";
+import { useSearchStore, useAuthStore } from "@/store/index";
 import { Podcast, AudioStream } from "@/types/podcast";
 import { extractVideoIdFromUrl } from "@/api/podcast";
 import { cn } from "@/lib/utils";
@@ -13,10 +13,36 @@ interface HomeProps {
   onPlayPodcast: (podcast: Podcast, stream: AudioStream) => void;
 }
 
+// Helper function to get greeting based on time of day
+const getGreeting = (): string => {
+  const hour = new Date().getHours();
+  
+  if (hour >= 5 && hour < 12) {
+    return 'Good morning';
+  } else if (hour >= 12 && hour < 18) {
+    return 'Good afternoon';
+  } else if (hour >= 18 && hour < 22) {
+    return 'Good evening';
+  } else {
+    return 'Good night';
+  }
+};
+
 const Home = ({ onPlayPodcast }: HomeProps) => {
   const { searchQuery } = useSearchStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [greeting, setGreeting] = useState(getGreeting());
+  
+  // Update greeting every minute
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setGreeting(getGreeting());
+    }, 60000); // 60000 ms = 1 minute
+    
+    return () => clearInterval(intervalId);
+  }, []);
   
   // Featured podcasts query - optimized to reduce unnecessary fetches
   const featuredQuery = useQuery({
@@ -129,143 +155,268 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
   };
   
   return (
-    <main className="flex-grow container mx-auto px-2 py-3 pb-20">
-      {/* Search Results Section (only shown when there's a search query) */}
-      {searchQuery && (
-        <div className="mb-10">
-          <h2 className="text-2xl font-medium mb-4 text-foreground">
-            Search Results for "<span className="text-primary font-semibold">{searchQuery}</span>"
-          </h2>
+    <main className="flex-grow pb-20 dark:bg-black">
+      
+      {/* Hero Section - Enhanced modern design */}
+      {!searchQuery && !featuredQuery.isLoading && featuredQuery.data?.items && featuredQuery.data.items.length > 0 && (
+        <div className="relative w-full h-80 sm:h-[420px] md:h-[480px] mb-12 overflow-hidden rounded-2xl mx-auto max-w-[1440px]">
+          {/* Hero Background with enhanced blur effect and gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-background z-10"></div>
           
-          {searchQuery1.isLoading ? (
+          <div
+            className="absolute inset-0 bg-cover bg-center animate-subtle-pulse"
+            style={{
+              backgroundImage: `url(${featuredQuery.data.items[0].thumbnail})`,
+              filter: 'blur(12px) saturate(120%)',
+              transform: 'scale(1.1)'
+            }}
+          ></div>
+          
+          {/* Glass Overlay */}
+          <div className="absolute inset-0 backdrop-blur-sm bg-black/10 z-[11]"></div>
+          
+          {/* Featured Podcast in Hero */}
+          <div className="container mx-auto h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-4 relative z-20">
+            <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left mt-8 md:mt-0">
+              <div className="flex items-center bg-orange-500/20 px-4 py-2 rounded-full mb-4 backdrop-blur-md border border-orange-500/30">
+                <span className="material-icons text-orange-400 mr-2 animate-pulse">auto_awesome</span>
+                <span className="text-orange-100 text-sm font-medium">{greeting}, {isAuthenticated && user?.name ? user.name : 'Guest'}</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-md">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-500">Most Popular Podcast</span>
+              </h1>
+              <p className="text-lg text-gray-200 mb-6 max-w-md drop-shadow-md">
+                {featuredQuery.data.items[0].title}
+              </p>
+              <button
+                className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full text-white font-medium shadow-lg hover:shadow-orange-500/25 hover:scale-105 active:scale-95 transition-all duration-300"
+                onClick={() => newestQuery.data && handlePlayPodcast(newestQuery.data.items[0])}
+              >
+                <span className="flex items-center">
+                  <span className="material-icons mr-2">play_circle</span>
+                  Play Newest Podcast
+                </span>
+              </button>
+            </div>
+            
+            <div className="hidden md:block w-1/3 p-4">
+              <div className="relative rounded-xl overflow-hidden shadow-2xl transform hover:translate-y-[-5px] transition-all duration-500 group">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-90 group-hover:opacity-60 transition-opacity duration-300"></div>
+                <img
+                  src={featuredQuery.data.items[0].thumbnail}
+                  alt="Featured Podcast"
+                  className="w-full aspect-video object-cover transform scale-100 group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute bottom-3 left-3 right-3">
+                  <h3 className="text-white font-bold text-lg line-clamp-2">{featuredQuery.data.items[0].title}</h3>
+                  <div className="flex items-center mt-1">
+                    <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center mr-2">
+                      <span className="material-icons text-white text-xs">person</span>
+                    </div>
+                    <p className="text-gray-200 text-sm">{featuredQuery.data.items[0].uploaderName}</p>
+                    {featuredQuery.data.items[0].uploaderVerified && (
+                      <span className="material-icons text-orange-400 text-sm ml-1">verified</span>
+                    )}
+                  </div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <button
+                    className="w-16 h-16 rounded-full bg-orange-500/90 text-white flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 border border-white/20 backdrop-blur-sm hover:bg-orange-600"
+                    onClick={() => featuredQuery.data && handlePlayPodcast(featuredQuery.data.items[0])}
+                  >
+                    <span className="material-icons text-3xl ml-1">play_arrow</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="container mx-auto px-4">
+        {/* Personalized Greeting - Only show when not searching and user is authenticated - Simplified */}
+        {!searchQuery && isAuthenticated && (
+          <div className="bg-gradient-to-r from-orange-500/10 to-orange-500/5 dark:from-orange-900/20 dark:to-zinc-900 p-5 rounded-xl mb-8 border border-orange-100/50 dark:border-zinc-800 shadow-md">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white shadow-md flex-shrink-0 mr-4">
+                <span className="material-icons text-xl">
+                  {greeting === 'Good morning' && 'wb_sunny'}
+                  {greeting === 'Good afternoon' && 'wb_twilight'}
+                  {greeting === 'Good evening' && 'nights_stay'}
+                  {greeting === 'Good night' && 'bedtime'}
+                </span>
+              </div>
+              <div>
+                <h2 className="text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100">
+                  {greeting}, <span className="text-orange-500 dark:text-orange-400">{user?.name || 'User'}</span>
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  {greeting === 'Good morning' && 'Start your day with inspiring podcasts'}
+                  {greeting === 'Good afternoon' && 'Taking a break? Find something new'}
+                  {greeting === 'Good evening' && 'Unwind with your favorites'}
+                  {greeting === 'Good night' && 'Something relaxing before bed?'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Search Results Section (only shown when there's a search query) */}
+        {searchQuery && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center">
+              <span className="material-icons mr-2 text-orange-500">search</span>
+              Results for "<span className="text-orange-500">{searchQuery}</span>"
+            </h2>
+            
+            {searchQuery1.isLoading ? (
+              <div className="flex justify-center py-8">
+                <LoadingIndicator text="Finding podcasts..." />
+              </div>
+            ) : (
+              <>
+                {searchQuery1.data?.items && searchQuery1.data.items.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+                    {searchQuery1.data.items.map((podcast, index) => (
+                      <PodcastCard 
+                        key={`search-${podcast.url}-${index}`} 
+                        podcast={podcast} 
+                        onClick={() => handlePlayPodcast(podcast)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-10 shadow-sm">
+                    <span className="material-icons text-5xl mb-3 text-gray-400 dark:text-gray-500">search_off</span>
+                    <p className="text-gray-600 dark:text-gray-300 text-lg">No results found for "{searchQuery}"</p>
+                    <p className="text-gray-500 dark:text-gray-400 mt-2">Try different keywords or check your spelling</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+        
+        {/* Newest Podcasts Section - Enhanced Scrollable */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-foreground flex items-center">
+              <span className="material-icons mr-2 text-orange-500">whatshot</span>
+              Newest Podcasts
+            </h2>
+            <div className="flex items-center text-sm">
+              <span className="hidden sm:inline text-gray-600 dark:text-gray-400 mr-2">Scroll for more</span>
+              <span className="material-icons text-gray-500 dark:text-gray-400 animate-bounce">arrow_forward</span>
+            </div>
+          </div>
+          
+          {newestQuery.isLoading ? (
             <div className="flex justify-center py-8">
-              <LoadingIndicator />
+              <LoadingIndicator text="Loading newest..." />
             </div>
           ) : (
             <>
-              {searchQuery1.data?.items && searchQuery1.data.items.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {searchQuery1.data.items.map((podcast, index) => (
+              {newestQuery.data?.items && newestQuery.data.items.length > 0 ? (
+                <div className="relative">
+                  <div className="overflow-x-auto pb-6 hide-scrollbar optimize-gpu rounded-lg" 
+                       style={{ 
+                         WebkitOverflowScrolling: 'touch',
+                         scrollBehavior: 'smooth',
+                         msOverflowStyle: 'none',
+                         transform: 'translateZ(0)',
+                         willChange: 'scroll-position'
+                       }}>
+                    <div className="flex space-x-6 px-3 py-2 optimize-gpu" 
+                         style={{ 
+                           minWidth: 'min-content', 
+                           transform: 'translateZ(0)'
+                         }}>
+                      {newestQuery.data.items.map((podcast, index) => (
+                        <div className="w-72 sm:w-72 md:w-[340px] lg:w-[380px] xl:w-96 flex-shrink-0 optimize-gpu" 
+                             key={`newest-${podcast.url}-${index}`}
+                             style={{ 
+                               transform: 'translateZ(0)',
+                               willChange: 'transform'
+                             }}>
+                          <PodcastCard 
+                            podcast={podcast} 
+                            onClick={() => handlePlayPodcast(podcast)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Fade gradients on edges */}
+                  <div className={cn(
+                    "absolute left-0 top-0 bottom-0 w-20 pointer-events-none optimize-gpu",
+                    "bg-gradient-to-r from-background to-transparent dark:from-background/95"
+                  )}
+                  style={{ willChange: 'opacity' }}></div>
+                  <div className={cn(
+                    "absolute right-0 top-0 bottom-0 w-20 pointer-events-none optimize-gpu",
+                    "bg-gradient-to-l from-background to-transparent dark:from-background/95"
+                  )}
+                  style={{ willChange: 'opacity' }}></div>
+                </div>
+              ) : (
+                <div className="text-center bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-10 shadow-sm">
+                  <span className="material-icons text-5xl mb-3 text-gray-400 dark:text-gray-500">podcasts</span>
+                  <p className="text-gray-600 dark:text-gray-300">No new podcasts available</p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        
+        {/* Featured Podcasts Section - Enhanced Grid */}
+        <div className="mb-10">
+          <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center">
+            <span className="material-icons mr-2 text-orange-500">star</span>
+            Featured Podcasts
+          </h2>
+          
+          {featuredQuery.isLoading ? (
+            <div className="flex justify-center py-8">
+              <LoadingIndicator text="Loading featured..." />
+            </div>
+          ) : (
+            <>
+              {processedFeatured.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+                  {processedFeatured.map((podcast, index) => (
                     <PodcastCard 
-                      key={`search-${podcast.url}-${index}`} 
+                      key={`featured-${podcast.url}-${index}`} 
                       podcast={podcast} 
                       onClick={() => handlePlayPodcast(podcast)}
                     />
                   ))}
                 </div>
               ) : (
-                <div className="text-center text-muted-foreground py-8">
-                  <span className="material-icons text-5xl mb-2">search_off</span>
-                  <p>No results found for "{searchQuery}"</p>
+                <div className="text-center bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-10 shadow-sm">
+                  <span className="material-icons text-5xl mb-3 text-gray-400 dark:text-gray-500">podcasts</span>
+                  <p className="text-gray-600 dark:text-gray-300">No additional featured podcasts available</p>
                 </div>
               )}
             </>
           )}
         </div>
-      )}
-      
-      {/* Newest Podcasts Section - Horizontally Scrollable */}
-      <div className="mb-10">
-        <h2 className="text-2xl font-medium mb-4 text-foreground flex items-center">
-          <span className="material-icons mr-2 text-primary">whatshot</span>
-          Newest Podcasts
-        </h2>
         
-        {newestQuery.isLoading ? (
-          <div className="flex justify-center py-8">
-            <LoadingIndicator />
+        {/* Global Error and Loading Indicators */}
+        {isLoading && (
+          <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50">
+            <LoadingIndicator fullScreen={true} />
           </div>
-        ) : (
-          <>
-            {newestQuery.data?.items && newestQuery.data.items.length > 0 ? (
-              <div className="relative">
-                <div className="overflow-x-auto pb-4 hide-scrollbar optimize-gpu" 
-                     style={{ 
-                       WebkitOverflowScrolling: 'touch',
-                       scrollBehavior: 'smooth',
-                       msOverflowStyle: 'none',
-                       transform: 'translateZ(0)',
-                       willChange: 'scroll-position'
-                     }}>
-                  <div className="flex space-x-4 px-2 optimize-gpu" 
-                       style={{ 
-                         minWidth: 'min-content', 
-                         transform: 'translateZ(0)'
-                       }}>
-                    {newestQuery.data.items.map((podcast, index) => (
-                      <div className="w-64 md:w-72 flex-shrink-0 optimize-gpu" 
-                           key={`newest-${podcast.url}-${index}`}
-                           style={{ 
-                             transform: 'translateZ(0)',
-                             willChange: 'transform'
-                           }}>
-                        <PodcastCard 
-                          podcast={podcast} 
-                          onClick={() => handlePlayPodcast(podcast)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className={cn(
-                  "absolute left-0 top-1/2 transform -translate-y-1/2 w-12 h-full pointer-events-none optimize-gpu",
-                  "bg-gradient-to-r from-background to-transparent dark:from-background/90"
-                )}
-                style={{ willChange: 'opacity' }}></div>
-                <div className={cn(
-                  "absolute right-0 top-1/2 transform -translate-y-1/2 w-12 h-full pointer-events-none optimize-gpu",
-                  "bg-gradient-to-l from-background to-transparent dark:from-background/90"
-                )}
-                style={{ willChange: 'opacity' }}></div>
-              </div>
-            ) : (
-              <div className="text-center text-muted-foreground py-8">
-                <span className="material-icons text-3xl mb-2 text-primary/70">podcasts</span>
-                <p>No new podcasts available</p>
-              </div>
-            )}
-          </>
         )}
-      </div>
-      
-      {/* Featured Podcasts Section */}
-      <div className="mb-10">
-        <h2 className="text-2xl font-medium mb-4 text-foreground flex items-center">
-          <span className="material-icons mr-2 text-primary">star</span>
-          Featured Podcasts
-        </h2>
         
-        {featuredQuery.isLoading ? (
-          <div className="flex justify-center py-8">
-            <LoadingIndicator />
+        {error && (
+          <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+            <ErrorMessage message={error} onDismiss={() => setError(null)} />
           </div>
-        ) : (
-          <>
-            {processedFeatured.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {processedFeatured.map((podcast, index) => (
-                  <PodcastCard 
-                    key={`featured-${podcast.url}-${index}`} 
-                    podcast={podcast} 
-                    onClick={() => handlePlayPodcast(podcast)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center text-muted-foreground py-8">
-                <span className="material-icons text-3xl mb-2 text-primary/70">podcasts</span>
-                <p>No additional featured podcasts available</p>
-              </div>
-            )}
-          </>
         )}
+        
+        {/* Additional padding at the bottom for the audio player */}
+        <div className="h-28"></div>
       </div>
-      
-      {isLoading && <LoadingIndicator />}
-      {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
-      
-      {/* Additional padding at the bottom for the audio player */}
-      <div className="h-28"></div>
     </main>
   );
 };

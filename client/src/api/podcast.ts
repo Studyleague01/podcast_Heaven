@@ -1,15 +1,43 @@
 import { Podcast, AudioStream, Channel, SearchResponse, FeaturedResponse, NewestResponse, StreamResponse, ChannelResponse } from '@/types/podcast';
 
-const API_BASE_URL = 'https://backendmix-emergeny.vercel.app';
+// Direct API access - no server wrapper
+const EXTERNAL_API_URL = 'https://backendmix-emergeny.vercel.app';
+
+// Helper function to standardize fetch requests with timeouts and error handling
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 8000): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status} ${response.statusText}`);
+    }
+    
+    return response;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error(`Request timed out after ${timeoutMs}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 export async function searchPodcasts(query: string): Promise<SearchResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(query)}`);
-    
-    if (!response.ok) {
-      throw new Error(`Search failed: ${response.statusText}`);
-    }
-    
+    const response = await fetchWithTimeout(
+      `${EXTERNAL_API_URL}/search?q=${encodeURIComponent(query)}`
+    );
     return await response.json();
   } catch (error) {
     console.error('Search error:', error);
@@ -19,12 +47,7 @@ export async function searchPodcasts(query: string): Promise<SearchResponse> {
 
 export async function getFeaturedPodcasts(): Promise<FeaturedResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/featured`);
-    
-    if (!response.ok) {
-      throw new Error(`Featured podcasts fetch failed: ${response.statusText}`);
-    }
-    
+    const response = await fetchWithTimeout(`${EXTERNAL_API_URL}/featured`);
     return await response.json();
   } catch (error) {
     console.error('Featured podcasts error:', error);
@@ -34,12 +57,7 @@ export async function getFeaturedPodcasts(): Promise<FeaturedResponse> {
 
 export async function getNewestPodcasts(): Promise<NewestResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/newest`);
-    
-    if (!response.ok) {
-      throw new Error(`Newest podcasts fetch failed: ${response.statusText}`);
-    }
-    
+    const response = await fetchWithTimeout(`${EXTERNAL_API_URL}/newest`);
     return await response.json();
   } catch (error) {
     console.error('Newest podcasts error:', error);
@@ -49,12 +67,7 @@ export async function getNewestPodcasts(): Promise<NewestResponse> {
 
 export async function getAudioStream(videoId: string): Promise<StreamResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/streams/${videoId}`);
-    
-    if (!response.ok) {
-      throw new Error(`Audio stream fetch failed: ${response.statusText}`);
-    }
-    
+    const response = await fetchWithTimeout(`${EXTERNAL_API_URL}/streams/${videoId}`);
     return await response.json();
   } catch (error) {
     console.error('Audio stream error:', error);
@@ -64,12 +77,7 @@ export async function getAudioStream(videoId: string): Promise<StreamResponse> {
 
 export async function getChannelInfo(channelId: string): Promise<ChannelResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/channel/${channelId}`);
-    
-    if (!response.ok) {
-      throw new Error(`Channel info fetch failed: ${response.statusText}`);
-    }
-    
+    const response = await fetchWithTimeout(`${EXTERNAL_API_URL}/channel/${channelId}`);
     return await response.json();
   } catch (error) {
     console.error('Channel info error:', error);
@@ -79,12 +87,9 @@ export async function getChannelInfo(channelId: string): Promise<ChannelResponse
 
 export async function getMoreChannelEpisodes(channelId: string, nextPageToken: string): Promise<SearchResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/nextpage/channel/${channelId}?nextpage=${encodeURIComponent(nextPageToken)}`);
-    
-    if (!response.ok) {
-      throw new Error(`Channel episodes fetch failed: ${response.statusText}`);
-    }
-    
+    const response = await fetchWithTimeout(
+      `${EXTERNAL_API_URL}/nextpage/channel/${channelId}?nextpage=${encodeURIComponent(nextPageToken)}`
+    );
     return await response.json();
   } catch (error) {
     console.error('Channel episodes error:', error);

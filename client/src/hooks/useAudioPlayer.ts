@@ -4,7 +4,7 @@ interface UseAudioPlayerProps {
   audioRef: RefObject<HTMLAudioElement>;
   progressBarRef: RefObject<HTMLDivElement>;
   volumeSliderRef: RefObject<HTMLDivElement>;
-  expandedProgressBarRef: RefObject<HTMLDivElement>;
+  expandedProgressBarRef: RefObject<HTMLInputElement | HTMLDivElement>;
   isPlaying: boolean;
   onTogglePlay: (isPlaying: boolean) => void;
   setCurrentTime: (time: number) => void;
@@ -41,38 +41,63 @@ export const useAudioPlayer = ({
     }
   }, [audioRef, setDuration, volume, isMuted]);
   
-  const handleProgressBarClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (progressBarRef.current && audioRef.current) {
+  // Generic progress bar click handler that works with any element type
+  const handleProgressBarClick = useCallback((e: React.MouseEvent<Element>) => {
+    if (progressBarRef.current && audioRef.current && !isNaN(audioRef.current.duration) && audioRef.current.duration > 0) {
       const rect = progressBarRef.current.getBoundingClientRect();
       const pos = (e.clientX - rect.left) / rect.width;
-      audioRef.current.currentTime = pos * audioRef.current.duration;
-      setCurrentTime(audioRef.current.currentTime);
+      const newTime = pos * audioRef.current.duration;
+      const safeTime = Math.max(0, Math.min(newTime, audioRef.current.duration));
+      
+      if (!isNaN(safeTime) && isFinite(safeTime)) {
+        audioRef.current.currentTime = safeTime;
+        setCurrentTime(safeTime);
+      }
     }
   }, [progressBarRef, audioRef, setCurrentTime]);
   
-  const handleExpandedProgressBarClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (expandedProgressBarRef.current && audioRef.current) {
+  // Generic expanded progress bar click handler
+  const handleExpandedProgressBarClick = useCallback((e: React.MouseEvent<Element>) => {
+    if (expandedProgressBarRef.current && audioRef.current && !isNaN(audioRef.current.duration) && audioRef.current.duration > 0) {
       const rect = expandedProgressBarRef.current.getBoundingClientRect();
       const pos = (e.clientX - rect.left) / rect.width;
-      audioRef.current.currentTime = pos * audioRef.current.duration;
-      setCurrentTime(audioRef.current.currentTime);
+      const newTime = pos * audioRef.current.duration;
+      const safeTime = Math.max(0, Math.min(newTime, audioRef.current.duration));
+      
+      if (!isNaN(safeTime) && isFinite(safeTime)) {
+        audioRef.current.currentTime = safeTime;
+        setCurrentTime(safeTime);
+      }
     }
   }, [expandedProgressBarRef, audioRef, setCurrentTime]);
   
-  const handleVolumeChange = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (volumeSliderRef.current && audioRef.current) {
-      const rect = volumeSliderRef.current.getBoundingClientRect();
-      const newVolume = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      setVolume(newVolume);
-      audioRef.current.volume = newVolume;
+  // Handle range input direct change
+  const handleRangeChange = useCallback((value: number) => {
+    if (audioRef.current && !isNaN(value) && isFinite(value)) {
+      // Ensure value is within valid range
+      const safeValue = Math.max(0, Math.min(value, audioRef.current.duration || 0));
+      if (!isNaN(safeValue) && isFinite(safeValue)) {
+        audioRef.current.currentTime = safeValue;
+        setCurrentTime(safeValue);
+      }
     }
-  }, [volumeSliderRef, audioRef, setVolume]);
+  }, [audioRef, setCurrentTime]);
+  
+  // Handle volume change from range input
+  const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    if (audioRef.current) {
+      setVolume(newVolume);
+      audioRef.current.volume = isMuted ? 0 : newVolume;
+    }
+  }, [audioRef, setVolume, isMuted]);
   
   return {
     handleTimeUpdate,
     handleLoadedMetadata,
     handleProgressBarClick,
     handleExpandedProgressBarClick,
+    handleRangeChange,
     handleVolumeChange
   };
 };

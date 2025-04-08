@@ -19,13 +19,14 @@ const ErrorMessage = ({ message, onDismiss, autoClose = true, duration = 5000 }:
   }, [autoClose, duration, onDismiss]);
   
   return (
-    <div className="fixed inset-x-0 top-4 mx-auto max-w-md z-50">
-      <div className="bg-error text-white px-4 py-3 rounded-lg shadow-lg flex items-center">
-        <span className="material-icons mr-2">error</span>
-        <span>{message}</span>
+    <div className="fixed inset-x-0 top-4 mx-auto max-w-md z-50 px-4">
+      <div className="bg-white text-gray-800 px-4 py-3 rounded-md shadow-lg flex items-center border border-gray-200 animate-in fade-in-0 zoom-in-95 duration-200">
+        <span className="material-icons text-red-600 mr-3 text-base">error</span>
+        <span className="text-sm">{message}</span>
         <button 
-          className="ml-auto text-white"
+          className="ml-auto text-gray-500 hover:text-gray-800 transition-colors"
           onClick={onDismiss}
+          aria-label="Dismiss"
         >
           <span className="material-icons">close</span>
         </button>
