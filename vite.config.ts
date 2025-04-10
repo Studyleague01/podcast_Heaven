@@ -29,5 +29,17 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: path.resolve(import.meta.dirname, "client/index.html"),
+        create: path.resolve(import.meta.dirname, "client/create.html")
+      },
+      output: {
+        dir: path.resolve(import.meta.dirname, "dist"),
+        entryFileNames: "assets/[name]-[hash].js",
+        chunkFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash].[ext]"
+      }
+    }
   },
 });
