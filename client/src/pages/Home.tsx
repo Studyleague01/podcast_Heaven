@@ -157,8 +157,8 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
   return (
     <main className="flex-grow pb-20 dark:bg-black">
       
-      {/* Hero Section - Enhanced modern design */}
-      {!searchQuery && !featuredQuery.isLoading && featuredQuery.data?.items && featuredQuery.data.items.length > 0 && (
+      {/* Hero Section - Using newest podcasts instead of featured */}
+      {!searchQuery && !newestQuery.isLoading && newestQuery.data?.items && newestQuery.data.items.length > 0 && (
         <div className="relative w-full h-80 sm:h-[420px] md:h-[480px] mb-12 overflow-hidden rounded-2xl mx-auto max-w-[1440px]">
           {/* Hero Background with enhanced blur effect and gradient */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-background z-10"></div>
@@ -166,7 +166,7 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
           <div
             className="absolute inset-0 bg-cover bg-center animate-subtle-pulse"
             style={{
-              backgroundImage: `url(${featuredQuery.data.items[0].thumbnail})`,
+              backgroundImage: `url(${newestQuery.data.items[0].thumbnail})`,
               filter: 'blur(12px) saturate(120%)',
               transform: 'scale(1.1)'
             }}
@@ -175,7 +175,7 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
           {/* Glass Overlay */}
           <div className="absolute inset-0 backdrop-blur-sm bg-black/10 z-[11]"></div>
           
-          {/* Featured Podcast in Hero */}
+          {/* Newest Podcast in Hero */}
           <div className="container mx-auto h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-4 relative z-20">
             <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left mt-8 md:mt-0">
               <div className="flex items-center bg-orange-500/20 px-4 py-2 rounded-full mb-4 backdrop-blur-md border border-orange-500/30">
@@ -183,10 +183,10 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
                 <span className="text-orange-100 text-sm font-medium">{greeting}, {isAuthenticated && user?.name ? user.name : 'Guest'}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-md">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-500">Most Popular Podcast</span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-500">Latest Podcast Release</span>
               </h1>
               <p className="text-lg text-gray-200 mb-6 max-w-md drop-shadow-md">
-                {featuredQuery.data.items[0].title}
+                {newestQuery.data.items[0].title}
               </p>
               <button
                 className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full text-white font-medium shadow-lg hover:shadow-orange-500/25 hover:scale-105 active:scale-95 transition-all duration-300"
@@ -194,7 +194,7 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
               >
                 <span className="flex items-center">
                   <span className="material-icons mr-2">play_circle</span>
-                  Play Newest Podcast
+                  Play Now
                 </span>
               </button>
             </div>
@@ -203,18 +203,18 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
               <div className="relative rounded-xl overflow-hidden shadow-2xl transform hover:translate-y-[-5px] transition-all duration-500 group">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-90 group-hover:opacity-60 transition-opacity duration-300"></div>
                 <img
-                  src={featuredQuery.data.items[0].thumbnail}
-                  alt="Featured Podcast"
+                  src={newestQuery.data.items[0].thumbnail}
+                  alt="Latest Podcast"
                   className="w-full aspect-video object-cover transform scale-100 group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute bottom-3 left-3 right-3">
-                  <h3 className="text-white font-bold text-lg line-clamp-2">{featuredQuery.data.items[0].title}</h3>
+                  <h3 className="text-white font-bold text-lg line-clamp-2">{newestQuery.data.items[0].title}</h3>
                   <div className="flex items-center mt-1">
                     <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center mr-2">
                       <span className="material-icons text-white text-xs">person</span>
                     </div>
-                    <p className="text-gray-200 text-sm">{featuredQuery.data.items[0].uploaderName}</p>
-                    {featuredQuery.data.items[0].uploaderVerified && (
+                    <p className="text-gray-200 text-sm">{newestQuery.data.items[0].uploaderName}</p>
+                    {newestQuery.data.items[0].uploaderVerified && (
                       <span className="material-icons text-orange-400 text-sm ml-1">verified</span>
                     )}
                   </div>
@@ -222,7 +222,7 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <button
                     className="w-16 h-16 rounded-full bg-orange-500/90 text-white flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 border border-white/20 backdrop-blur-sm hover:bg-orange-600"
-                    onClick={() => featuredQuery.data && handlePlayPodcast(featuredQuery.data.items[0])}
+                    onClick={() => newestQuery.data && handlePlayPodcast(newestQuery.data.items[0])}
                   >
                     <span className="material-icons text-3xl ml-1">play_arrow</span>
                   </button>
@@ -234,11 +234,6 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
       )}
 
       <div className="container mx-auto px-4">
-        {/* Personalized Greeting - Only show when not searching and user is authenticated - Simplified */}
-        {!searchQuery && isAuthenticated && (
-          <div className="mb-12" class="hide">
-          </div>
-        )}
 
         {/* Search Results Section (only shown when there's a search query) */}
         {searchQuery && (
@@ -297,24 +292,21 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
             <>
               {newestQuery.data?.items && newestQuery.data.items.length > 0 ? (
                 <div className="relative">
-                  <div className="overflow-x-auto pb-6 hide-scrollbar optimize-gpu rounded-lg" 
+                  <div className="overflow-x-auto pb-6 hide-scrollbar hardware-accelerated rounded-lg" 
                        style={{ 
                          WebkitOverflowScrolling: 'touch',
                          scrollBehavior: 'smooth',
                          msOverflowStyle: 'none',
-                         transform: 'translateZ(0)',
                          willChange: 'scroll-position'
                        }}>
-                    <div className="flex space-x-6 px-3 py-2 optimize-gpu" 
+                    <div className="flex space-x-6 px-3 py-2 hardware-accelerated" 
                          style={{ 
-                           minWidth: 'min-content', 
-                           transform: 'translateZ(0)'
+                           minWidth: 'min-content'
                          }}>
                       {newestQuery.data.items.map((podcast, index) => (
-                        <div className="w-72 sm:w-72 md:w-[340px] lg:w-[380px] xl:w-96 flex-shrink-0 optimize-gpu" 
+                        <div className="w-72 sm:w-72 md:w-[340px] lg:w-[380px] xl:w-96 flex-shrink-0 hardware-accelerated" 
                              key={`newest-${podcast.url}-${index}`}
                              style={{ 
-                               transform: 'translateZ(0)',
                                willChange: 'transform'
                              }}>
                           <PodcastCard 
@@ -325,14 +317,14 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
                       ))}
                     </div>
                   </div>
-                  {/* Fade gradients on edges */}
+                  {/* Fade gradients on edges - YouTube style */}
                   <div className={cn(
-                    "absolute left-0 top-0 bottom-0 w-20 pointer-events-none optimize-gpu",
+                    "absolute left-0 top-0 bottom-0 w-20 pointer-events-none hardware-accelerated",
                     "bg-gradient-to-r from-background to-transparent dark:from-background/95"
                   )}
                   style={{ willChange: 'opacity' }}></div>
                   <div className={cn(
-                    "absolute right-0 top-0 bottom-0 w-20 pointer-events-none optimize-gpu",
+                    "absolute right-0 top-0 bottom-0 w-20 pointer-events-none hardware-accelerated",
                     "bg-gradient-to-l from-background to-transparent dark:from-background/95"
                   )}
                   style={{ willChange: 'opacity' }}></div>

@@ -82,6 +82,34 @@
 }
 
 @layer utilities {
+  /* YouTube-inspired custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: #c7c7c7;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #a6a6a6;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: #4d4d4d;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: #636363;
+  }
+  
+  /* Option to hide scrollbar when needed */
   .hide-scrollbar {
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -91,7 +119,15 @@
     display: none;
   }
   
-  /* Basic smooth transitions */
+  /* Performance optimizations */
+  .hardware-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform;
+  }
+  
+  /* YouTube-style smooth transitions */
   .smooth-transition {
     transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
     transition-duration: 200ms;
@@ -106,40 +142,67 @@
     cursor: pointer;
   }
   
+  /* YouTube-style range inputs with orange accent */
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    height: 12px;
-    width: 12px;
+    height: 14px;
+    width: 14px;
     border-radius: 50%;
-    background: hsl(var(--primary));
-    margin-top: -4px;
-  }
-  
-  .dark input[type="range"]::-webkit-slider-thumb {
-    background: hsl(var(--accent-orange));
+    background: #ff7b00;
+    margin-top: -5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
   
   input[type="range"]::-moz-range-thumb {
-    height: 12px;
-    width: 12px;
+    height: 14px;
+    width: 14px;
     border-radius: 50%;
-    background: hsl(var(--primary));
+    background: #ff7b00;
     border: none;
-  }
-  
-  .dark input[type="range"]::-moz-range-thumb {
-    background: hsl(var(--accent-orange));
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
   
   input[type="range"]::-webkit-slider-runnable-track {
-    background: hsl(var(--muted));
+    background: #e5e5e5;
     height: 4px;
     border-radius: 2px;
   }
   
+  .dark input[type="range"]::-webkit-slider-runnable-track {
+    background: #4d4d4d;
+  }
+  
   input[type="range"]::-moz-range-track {
-    background: hsl(var(--muted));
+    background: #e5e5e5;
     height: 4px;
+    border-radius: 2px;
+  }
+  
+  .dark input[type="range"]::-moz-range-track {
+    background: #4d4d4d;
+  }
+  
+  /* YouTube progress gradient effect */
+  .youtube-progress-bar {
+    position: relative;
+    height: 4px;
+    border-radius: 2px;
+    background: #e5e5e5;
+    overflow: hidden;
+  }
+  
+  .dark .youtube-progress-bar {
+    background: #4d4d4d;
+  }
+  
+  .youtube-progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--progress, 0%);
+    background: #ff7b00;
     border-radius: 2px;
   }
   
@@ -223,5 +286,52 @@
     );
     background-size: 200% 100%;
     animation: shimmer 3s infinite;
+  }
+  
+  /* Enhanced Audio Player Styles */
+  .player-gradient-button {
+    background: linear-gradient(135deg, #ff7b00, #ff5500);
+    box-shadow: 0 6px 16px -8px rgba(255, 123, 0, 0.4);
+    transition: all 0.2s ease;
+  }
+  
+  .player-gradient-button:hover {
+    background: linear-gradient(135deg, #ff5500, #ff4400);
+    box-shadow: 0 8px 20px -6px rgba(255, 123, 0, 0.5);
+    transform: translateY(-1px);
+  }
+  
+  .player-gradient-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 12px -6px rgba(255, 123, 0, 0.4);
+  }
+  
+  /* Elegant Card Hover Effect */
+  .elegant-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+  }
+  
+  .elegant-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark .elegant-card {
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dark .elegant-card:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Overlay control button hover effect */
+  .overlay-control {
+    transition: all 0.15s ease;
+  }
+  
+  .overlay-control:hover {
+    transform: scale(1.1);
+    background-color: rgba(255, 123, 0, 0.9) !important;
   }
 }

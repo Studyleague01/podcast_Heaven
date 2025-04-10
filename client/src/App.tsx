@@ -1,7 +1,8 @@
-import { Switch, Route, useLocation, useRoute, useParams } from "wouter";
+import { Switch, Route, useLocation, useParams } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/Header";
-import AudioPlayer from "@/components/AudioPlayer";
+// Import the lightweight audio player
+import LightAudioPlayer from "@/components/LightAudioPlayer";
 import DirectSharePopup from "@/components/DirectSharePopup";
 import Home from "@/pages/Home";
 import PodcastDetail from "@/pages/PodcastDetail";
@@ -142,11 +143,11 @@ function App() {
       </div>
       
       {currentPodcast && isAuthenticated && (
-        <AudioPlayer 
+        <LightAudioPlayer 
           podcast={currentPodcast}
           audioStream={audioStream}
           isPlaying={isPlaying}
-          onTogglePlay={(state) => setIsPlaying(state)}
+          onTogglePlay={(state: boolean) => setIsPlaying(state)}
           onShare={handleShare}
         />
       )}
