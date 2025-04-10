@@ -61,61 +61,37 @@
             font-size: 24px;
             margin-bottom: 24px;
         }
-        .upload-container {
+        .coming-soon-container {
             background-color: #fff;
             border-radius: 8px;
-            padding: 24px;
+            padding: 40px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
-        .dark-mode .upload-container {
+        .dark-mode .coming-soon-container {
             background-color: #212121;
             box-shadow: 0 1px 2px rgba(255, 255, 255, 0.05);
         }
-        .upload-area {
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 60px 0;
-            text-align: center;
+        .coming-soon-icon {
+            font-size: 64px;
             margin-bottom: 24px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .upload-area:hover {
-            background-color: #f8f8f8;
-        }
-        .dark-mode .upload-area:hover {
-            background-color: #272727;
-        }
-        .dark-mode .upload-area {
-            border-color: #444;
-        }
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
             color: #ff7b00;
         }
-        .form-group {
+        .coming-soon-title {
+            font-size: 28px;
             margin-bottom: 16px;
+            font-weight: bold;
         }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
+        .coming-soon-description {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            color: #555;
         }
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e5e5e5;
-            border-radius: 4px;
-            font-size: 16px;
-            background-color: #fff;
+        .dark-mode .coming-soon-description {
+            color: #aaa;
         }
-        .dark-mode input, .dark-mode textarea {
-            background-color: #272727;
-            border-color: #444;
-            color: #fff;
-        }
-        button {
+        .notify-button {
             background-color: #ff7b00;
             color: white;
             border: none;
@@ -124,9 +100,8 @@
             font-size: 16px;
             cursor: pointer;
             font-weight: 500;
-            margin-top: 16px;
         }
-        button:hover {
+        .notify-button:hover {
             background-color: #e56f00;
         }
         .theme-toggle {
@@ -141,6 +116,24 @@
         .dark-mode .theme-toggle {
             color: #fff;
         }
+        .feature-list {
+            text-align: left;
+            max-width: 500px;
+            margin: 0 auto 32px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .feature-icon {
+            margin-right: 16px;
+            font-size: 24px;
+            color: #ff7b00;
+        }
+        .feature-text {
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -154,37 +147,31 @@
     <div class="container">
         <h1>Create New Podcast</h1>
         
-        <div class="upload-container">
-            <div class="upload-area" onclick="document.getElementById('file-upload').click()">
-                <div class="upload-icon">📤</div>
-                <p>Drag and drop audio files or click to upload</p>
-                <p style="font-size: 14px; color: #666; margin-top: 8px;">Supported formats: MP3, WAV, M4A</p>
-                <input type="file" id="file-upload" accept="audio/*" style="display: none;">
+        <div class="coming-soon-container">
+            <div class="coming-soon-icon">🎙️</div>
+            <h2 class="coming-soon-title">Podcast Feature Coming Soon!</h2>
+            <p class="coming-soon-description">We're working hard to bring you an amazing podcast creation and hosting experience. Check back soon!</p>
+            
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="feature-icon">🔊</span>
+                    <span class="feature-text">Upload and host your audio podcasts</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <span class="feature-text">Track your audience and engagement</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔄</span>
+                    <span class="feature-text">Distribute to all major podcast platforms</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">💰</span>
+                    <span class="feature-text">Monetize your content easily</span>
+                </div>
             </div>
             
-            <form id="podcast-form">
-                <div class="form-group">
-                    <label for="title">Podcast Title</label>
-                    <input type="text" id="title" name="title" placeholder="Enter a descriptive title">
-                </div>
-                
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" rows="4" placeholder="Tell listeners what your podcast is about"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="category">Category</label>
-                    <input type="text" id="category" name="category" placeholder="e.g. Technology, Education, Entertainment">
-                </div>
-                
-                <div class="form-group">
-                    <label for="tags">Tags (comma-separated)</label>
-                    <input type="text" id="tags" name="tags" placeholder="e.g. music, interview, tech">
-                </div>
-                
-                <button type="button" onclick="showUploadSuccess()">Upload Podcast</button>
-            </form>
+            <button class="notify-button" onclick="notifyMe()">Notify Me When It's Ready</button>
         </div>
     </div>
 
@@ -199,8 +186,8 @@
             }
         }
         
-        function showUploadSuccess() {
-            alert('This is a demo page. In a real application, your podcast would be uploaded now.');
+        function notifyMe() {
+            alert('Thank you for your interest! We will notify you when our podcast feature is available.');
         }
         
         // Check for system dark mode preference
