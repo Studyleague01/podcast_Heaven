@@ -4,16 +4,19 @@ import Header from "@/components/Header";
 // Import the lightweight audio player
 import LightAudioPlayer from "@/components/LightAudioPlayer";
 import DirectSharePopup from "@/components/DirectSharePopup";
+import InstallPrompt from "@/components/InstallPrompt";
+import OfflineFallback from "@/components/OfflineFallback";
 import Home from "@/pages/Home";
 import PodcastDetail from "@/pages/PodcastDetail";
 import ChannelView from "@/pages/ChannelView";
 import SearchResults from "@/pages/SearchResults";
 import Auth from "@/pages/Auth";
 import NotFound from "@/pages/not-found";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Podcast, AudioStream } from "@/types/podcast";
 import { useAudioPlayerStore, useSearchStore, useAuthStore } from "@/store/index";
 import { useShareStore } from "@/lib/useShare";
+import { NetworkContext, NetworkProvider } from "@/contexts/NetworkContext";
 
 // Route components for clean mounting
 const HomeRoute = ({ onPlayPodcast }: { onPlayPodcast: (podcast: Podcast, stream: AudioStream) => void }) => {
@@ -36,7 +39,9 @@ const ChannelRoute = ({ onPlayPodcast }: { onPlayPodcast: (podcast: Podcast, str
   return <ChannelView id={params?.id || ''} onPlayPodcast={onPlayPodcast} />;
 };
 
-function App() {
+// Main App Content with network awareness
+const AppContent = () => {
+  const { isOnline } = useContext(NetworkContext);
   const [currentPodcast, setCurrentPodcast] = useState<Podcast | null>(null);
   const [audioStream, setAudioStream] = useState<AudioStream | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -48,6 +53,11 @@ function App() {
   
   // Access the player state to load from it if needed
   const playerStore = useAudioPlayerStore();
+  
+  // Show offline fallback when not connected to the internet
+  if (!isOnline) {
+    return <OfflineFallback />;
+  }
 
   // Effect to initialize player from URL if provided
   useEffect(() => {
@@ -158,6 +168,16 @@ function App() {
       <DirectSharePopup />
     </div>
   );
-}
+};
+
+// Wrapper component that provides NetworkProvider and PWA install prompt
+const App = () => {
+  return (
+    <NetworkProvider>
+      <AppContent />
+      <InstallPrompt />
+    </NetworkProvider>
+  );
+};
 
 export default App;

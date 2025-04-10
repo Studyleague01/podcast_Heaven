@@ -1,11 +1,37 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import axios from "axios";
+import fs from "fs";
+import path from "path";
 import { storage } from "./storage";
+import { log } from "./vite";
 
 const BASE_URL = "https://backendmix-emergeny.vercel.app";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Handle the create.html route
+  app.get('/create.html', (req, res) => {
+    try {
+      const createHtmlPath = path.resolve(
+        import.meta.dirname,
+        "..",
+        "client",
+        "public",
+        "create.html"
+      );
+
+      if (fs.existsSync(createHtmlPath)) {
+        const content = fs.readFileSync(createHtmlPath, 'utf-8');
+        res.status(200).set({ "Content-Type": "text/html" }).end(content);
+      } else {
+        log("create.html not found at " + createHtmlPath);
+        res.status(404).send("Page not found");
+      }
+    } catch (e) {
+      log(`Error serving create.html: ${e}`);
+      res.status(500).send("Server error");
+    }
+  });
   // Proxy API endpoints to the podcast service
   
   // Search podcasts
