@@ -138,10 +138,10 @@ const PodcastDetail = ({ id, onPlayPodcast }: PodcastDetailProps) => {
   
   if (!podcast) {
     return (
-      <main className="flex-grow dark:bg-black container mx-auto px-4 py-6 pb-24">
+      <main className="flex-grow bg-white dark:bg-black container mx-auto px-4 py-6 pb-24">
         <div className="text-center py-12">
           <span className="material-icons text-5xl mb-2 text-gray-400">podcasts</span>
-          <h2 className="text-2xl font-semibold mb-2 text-foreground">Podcast Not Found</h2>
+          <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">Podcast Not Found</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">We couldn't find the podcast you're looking for.</p>
           <button 
             className="bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white px-6 py-2 rounded-full shadow-md transition-colors duration-200"
@@ -155,7 +155,7 @@ const PodcastDetail = ({ id, onPlayPodcast }: PodcastDetailProps) => {
   }
   
   return (
-    <main className="flex-grow pb-24 dark:bg-black">
+    <main className="flex-grow pb-24 bg-white dark:bg-black text-gray-900 dark:text-white">
       <div className="container mx-auto px-4 py-4">
         <div className="mb-6 flex items-center space-x-4">
           <button 
@@ -176,7 +176,7 @@ const PodcastDetail = ({ id, onPlayPodcast }: PodcastDetailProps) => {
         </div>
       
         <div className="mb-6">
-          <div className="bg-background dark:bg-zinc-900 rounded-lg shadow-md overflow-hidden">
+          <div className="bg-gray-50 dark:bg-zinc-900 rounded-lg shadow-md overflow-hidden">
             <div className="relative pb-[56.25%] md:pb-[40%] bg-muted/20 dark:bg-muted/10 overflow-hidden">
               <img 
                 src={podcast.thumbnail} 
@@ -213,7 +213,7 @@ const PodcastDetail = ({ id, onPlayPodcast }: PodcastDetailProps) => {
             </div>
             
             <div className="p-6">
-              <h2 className="text-2xl font-medium mb-2 text-foreground">{podcast.title}</h2>
+              <h2 className="text-2xl font-medium mb-2 text-gray-900 dark:text-white">{podcast.title}</h2>
               
               <div className="flex items-center mb-4">
                 <button 
@@ -227,7 +227,7 @@ const PodcastDetail = ({ id, onPlayPodcast }: PodcastDetailProps) => {
                 </button>
               </div>
               
-              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
+              <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
                 <div className="flex items-center">
                   <span className="material-icons text-sm mr-1">schedule</span>
                   <span>{formatDuration(podcast.duration)}</span>
@@ -256,7 +256,7 @@ const PodcastDetail = ({ id, onPlayPodcast }: PodcastDetailProps) => {
               
               {podcast.shortDescription && (
                 <div className="border-t border-border/20 pt-4">
-                  <p className="text-foreground">{podcast.shortDescription}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{podcast.shortDescription}</p>
                 </div>
               )}
             </div>

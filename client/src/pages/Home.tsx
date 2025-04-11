@@ -4,6 +4,7 @@ import { getFeaturedPodcasts, getNewestPodcasts, searchPodcasts, getAudioStream 
 import PodcastCard from "@/components/PodcastCard";
 import LoadingIndicator from "@/components/LoadingIndicator";
 import ErrorMessage from "@/components/ErrorMessage";
+import FeaturedCreators from "@/components/FeaturedCreators";
 import { useSearchStore, useAuthStore } from "@/store/index";
 import { Podcast, AudioStream } from "@/types/podcast";
 import { extractVideoIdFromUrl } from "@/api/podcast";
@@ -155,7 +156,7 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
   };
   
   return (
-    <main className="flex-grow pb-20 dark:bg-black">
+    <main className="flex-grow pb-20 bg-white dark:bg-black text-gray-900 dark:text-white">
       
       {/* Hero Section - Using newest podcasts instead of featured */}
       {!searchQuery && !newestQuery.isLoading && newestQuery.data?.items && newestQuery.data.items.length > 0 && (
@@ -238,7 +239,7 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
         {/* Search Results Section (only shown when there's a search query) */}
         {searchQuery && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
               <span className="material-icons mr-2 text-orange-500">search</span>
               Results for "<span className="text-orange-500">{searchQuery}</span>"
             </h2>
@@ -250,7 +251,7 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
             ) : (
               <>
                 {searchQuery1.data?.items && searchQuery1.data.items.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {searchQuery1.data.items.map((podcast, index) => (
                       <PodcastCard 
                         key={`search-${podcast.url}-${index}`} 
@@ -260,9 +261,9 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-10 shadow-sm">
-                    <span className="material-icons text-5xl mb-3 text-gray-400 dark:text-gray-500">search_off</span>
-                    <p className="text-gray-600 dark:text-gray-300 text-lg">No results found for "{searchQuery}"</p>
+                  <div className="text-center bg-gray-100 dark:bg-zinc-900 rounded-lg p-10 shadow-sm border border-gray-200 dark:border-zinc-800">
+                    <span className="material-icons text-5xl mb-3 text-gray-500 dark:text-gray-400">search_off</span>
+                    <p className="text-gray-700 dark:text-gray-300 text-lg">No results found for "{searchQuery}"</p>
                     <p className="text-gray-500 dark:text-gray-400 mt-2">Try different keywords or check your spelling</p>
                   </div>
                 )}
@@ -271,16 +272,23 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
           </div>
         )}
         
+        {/* Featured Creators Section */}
+        {!searchQuery && (
+          <div className="mb-10">
+            <FeaturedCreators />
+          </div>
+        )}
+        
         {/* Newest Podcasts Section - Enhanced Scrollable */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground flex items-center">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
               <span className="material-icons mr-2 text-orange-500">whatshot</span>
               Newest Podcasts
             </h2>
             <div className="flex items-center text-sm">
-              <span className="hidden sm:inline text-gray-600 dark:text-gray-400 mr-2">Scroll for more</span>
-              <span className="material-icons text-gray-500 dark:text-gray-400 animate-bounce">arrow_forward</span>
+              <span className="hidden sm:inline text-gray-600 dark:text-gray-300 mr-2">Scroll for more</span>
+              <span className="material-icons text-gray-600 dark:text-gray-300 animate-bounce">arrow_forward</span>
             </div>
           </div>
           
@@ -330,9 +338,9 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
                   style={{ willChange: 'opacity' }}></div>
                 </div>
               ) : (
-                <div className="text-center bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-10 shadow-sm">
-                  <span className="material-icons text-5xl mb-3 text-gray-400 dark:text-gray-500">podcasts</span>
-                  <p className="text-gray-600 dark:text-gray-300">No new podcasts available</p>
+                <div className="text-center bg-gray-100 dark:bg-zinc-900 rounded-lg p-10 shadow-sm border border-gray-200 dark:border-zinc-800">
+                  <span className="material-icons text-5xl mb-3 text-gray-500 dark:text-gray-400">podcasts</span>
+                  <p className="text-gray-700 dark:text-gray-300">No new podcasts available</p>
                 </div>
               )}
             </>
@@ -341,7 +349,7 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
         
         {/* Featured Podcasts Section - Enhanced Grid */}
         <div className="mb-10">
-          <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center">
+          <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
             <span className="material-icons mr-2 text-orange-500">star</span>
             Featured Podcasts
           </h2>
@@ -353,7 +361,7 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
           ) : (
             <>
               {processedFeatured.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {processedFeatured.map((podcast, index) => (
                     <PodcastCard 
                       key={`featured-${podcast.url}-${index}`} 
@@ -363,9 +371,9 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-10 shadow-sm">
-                  <span className="material-icons text-5xl mb-3 text-gray-400 dark:text-gray-500">podcasts</span>
-                  <p className="text-gray-600 dark:text-gray-300">No additional featured podcasts available</p>
+                <div className="text-center bg-gray-100 dark:bg-zinc-900 rounded-lg p-10 shadow-sm border border-gray-200 dark:border-zinc-800">
+                  <span className="material-icons text-5xl mb-3 text-gray-500 dark:text-gray-400">podcasts</span>
+                  <p className="text-gray-700 dark:text-gray-300">No additional featured podcasts available</p>
                 </div>
               )}
             </>

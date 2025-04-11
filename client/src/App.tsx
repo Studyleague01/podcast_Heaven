@@ -12,6 +12,7 @@ import ChannelView from "@/pages/ChannelView";
 import SearchResults from "@/pages/SearchResults";
 import Auth from "@/pages/Auth";
 import NotFound from "@/pages/not-found";
+import TestPage from "@/pages/TestPage";
 import { useState, useEffect, useContext } from "react";
 import { Podcast, AudioStream } from "@/types/podcast";
 import { useAudioPlayerStore, useSearchStore, useAuthStore } from "@/store/index";
@@ -144,6 +145,11 @@ const AppContent = () => {
           {/* Auth route is always accessible */}
           <Route path="/auth">
             <Auth />
+          </Route>
+          
+          {/* Test page route - always accessible */}
+          <Route path="/test">
+            <TestPage />
           </Route>
           
           <Route>

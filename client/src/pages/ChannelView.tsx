@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { getChannelInfo, getMoreChannelEpisodes, getAudioStream } from "@/api/podcast";
@@ -18,6 +18,7 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [nextPageToken, setNextPageToken] = useState<string | undefined>(undefined);
+  const [allEpisodes, setAllEpisodes] = useState<Podcast[]>([]);
   
   // Get channel information directly from the API
   const { data: channelData, isLoading: isChannelLoading, isError } = useQuery<ChannelResponse>({
@@ -28,7 +29,19 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
         if (!response.ok) {
           throw new Error(`Failed to fetch channel data: ${response.statusText}`);
         }
-        return await response.json();
+        const data = await response.json();
+        
+        // Initialize allEpisodes when we get initial data
+        if (data.relatedStreams && data.relatedStreams.length > 0) {
+          setAllEpisodes(data.relatedStreams);
+        }
+        
+        // Set next page token if available
+        if (data.nextpage) {
+          setNextPageToken(data.nextpage);
+        }
+        
+        return data;
       } catch (error) {
         console.error('Error fetching channel data:', error);
         throw error;
@@ -41,13 +54,33 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
     
     try {
       setIsLoading(true);
-      const response = await getMoreChannelEpisodes(id, nextPageToken);
-      if (response && response.items) {
-        // In a real app, we would append these items to the existing list
-        setNextPageToken(response.nextpage);
+      console.log('Loading more with token:', nextPageToken);
+      
+      // Use our API method to fetch more episodes
+      const jsonData = await getMoreChannelEpisodes(id, nextPageToken);
+      
+      if (jsonData && jsonData.relatedStreams && jsonData.relatedStreams.length > 0) {
+        // Append the new items to our existing episodes
+        setAllEpisodes(prev => [...prev, ...jsonData.relatedStreams]);
+        
+        // Update the next page token if available
+        if (jsonData.nextpage) {
+          console.log('Setting next page token:', jsonData.nextpage);
+          setNextPageToken(jsonData.nextpage);
+        } else {
+          // No more pages
+          console.log('No more pages available');
+          setNextPageToken(undefined);
+        }
+      } else {
+        // No more items or error
+        console.log('No related streams found in response');
+        setNextPageToken(undefined);
       }
     } catch (err) {
+      console.error('Error loading more:', err);
       setError('Failed to load more episodes');
+      setNextPageToken(undefined);
     } finally {
       setIsLoading(false);
     }
@@ -93,11 +126,11 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
   
   if (isError || !channelData) {
     return (
-      <main className="flex-grow dark:bg-black container mx-auto px-4 py-6 pb-24">
+      <main className="flex-grow bg-white dark:bg-black text-gray-900 dark:text-white container mx-auto px-4 py-6 pb-24">
         <div className="text-center py-12">
-          <span className="material-icons text-5xl mb-2 text-gray-400">error</span>
+          <span className="material-icons text-5xl mb-2 text-gray-500 dark:text-gray-400">error</span>
           <h2 className="text-2xl font-semibold mb-2">Channel Not Found</h2>
-          <p className="text-gray-600 mb-4">We couldn't find the channel you're looking for.</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">We couldn't find the channel you're looking for.</p>
           <button 
             className="bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white px-6 py-2 rounded-full shadow-md transition-colors duration-200"
             onClick={() => navigate('/')}
@@ -109,13 +142,8 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
     );
   }
   
-  // Set the next page token if available
-  if (channelData.nextpage && !nextPageToken) {
-    setNextPageToken(channelData.nextpage);
-  }
-  
   return (
-    <main className="flex-grow pb-24 dark:bg-black">
+    <main className="flex-grow pb-24 bg-white dark:bg-black text-gray-900 dark:text-white">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center space-x-4 mb-4">
           <button 
@@ -135,7 +163,7 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
           </button>
         </div>
       
-        <div className="bg-background dark:bg-zinc-900 rounded-lg shadow-md overflow-hidden mb-6">
+        <div className="bg-gray-50 dark:bg-zinc-900 rounded-lg shadow-md overflow-hidden mb-6">
           <div className="relative h-32 md:h-48 bg-gradient-to-r from-orange-600 to-orange-500 dark:from-orange-700 dark:to-orange-900">
             {channelData.bannerUrl && (
               <img 
@@ -159,22 +187,22 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
             </div>
           </div>
           <div className="pt-14 pb-6 px-6">
-            <h2 className="text-2xl font-medium text-foreground">{channelData.name}</h2>
-            <div className="flex items-center text-muted-foreground mt-1">
+            <h2 className="text-2xl font-medium text-gray-900 dark:text-white">{channelData.name}</h2>
+            <div className="flex items-center text-gray-600 dark:text-gray-400 mt-1">
               <span className="material-icons text-sm mr-1">people</span>
               <span>{channelData.subscribers || 'N/A subscribers'}</span>
             </div>
             {channelData.description && (
-              <p className="mt-4 text-foreground">{channelData.description}</p>
+              <p className="mt-4 text-gray-700 dark:text-gray-300">{channelData.description}</p>
             )}
           </div>
         </div>
         
-        <h3 className="text-xl font-medium mb-4 text-foreground">Channel Episodes</h3>
+        <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">Channel Episodes</h3>
         
-        {channelData.relatedStreams && channelData.relatedStreams.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {channelData.relatedStreams.map((podcast: Podcast, index: number) => (
+        {allEpisodes && allEpisodes.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {allEpisodes.map((podcast: Podcast, index: number) => (
               <PodcastCard 
                 key={`${podcast.url}-${index}`} 
                 podcast={podcast}
@@ -183,7 +211,7 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="text-center py-8 text-gray-600 dark:text-gray-400">
             <span className="material-icons text-3xl mb-2 text-orange-500/70">podcasts</span>
             <p>No episodes found for this channel</p>
           </div>

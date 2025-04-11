@@ -91,12 +91,12 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
         />
         
         <div 
-          className="fixed bottom-6 left-0 right-0 mx-auto w-[85%] max-w-sm bg-black/85 backdrop-blur-lg z-40 cursor-pointer rounded-full shadow-xl border border-gray-800 overflow-hidden"
+          className="fixed bottom-6 left-0 right-0 mx-auto w-[85%] max-w-sm bg-black/75 backdrop-blur-lg z-40 cursor-pointer rounded-full shadow-xl border border-gray-800/50 overflow-hidden hover:bg-black/85 transition-all duration-300"
           onClick={toggleExpanded}
         >
           <div className="flex items-center p-2 px-3">
             {/* Thumbnail - circular like in example */}
-            <div className="w-10 h-10 flex-shrink-0 rounded-full overflow-hidden mr-3 shadow-md">
+            <div className="w-10 h-10 flex-shrink-0 rounded-full overflow-hidden mr-3 shadow-md border border-white/10">
               <img 
                 src={getYouTubeThumbnail(podcast.url, 'default')} 
                 alt={podcast.title}
@@ -128,7 +128,7 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
     );
   }
 
-  // Expanded player with minimal styling
+  // Expanded player with enhanced styling
   return (
     <>
       <audio 
@@ -139,9 +139,9 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
         hidden
       />
       
-      <div className="fixed inset-0 bg-gradient-to-b from-white to-gray-50 dark:from-zinc-900 dark:to-black z-50 flex flex-col">
+      <div className="fixed inset-0 bg-gradient-to-b from-white/95 to-gray-50/95 dark:from-zinc-900/95 dark:to-black/95 backdrop-blur-md z-50 flex flex-col">
         {/* Elegant glassmorphic header */}
-        <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50 backdrop-blur-sm bg-white/90 dark:bg-zinc-900/90 sticky top-0 z-10">
+        <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 sticky top-0 z-10">
           <button 
             onClick={toggleExpanded}
             className="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800/70 rounded-full transition-colors"
@@ -152,8 +152,8 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
           <div className="flex flex-col items-center">
             <h3 className="font-medium text-sm text-gray-900 dark:text-white">Now Playing</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              <span className="text-gray-900 dark:text-white">Crypt</span>
-              <span className="text-orange-500">une</span>
+              <span className="text-gray-900 dark:text-white">Vel</span>
+              <span className="text-orange-500">in</span>
             </p>
           </div>
           
@@ -288,7 +288,7 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
                 </h3>
                 <div className="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-5 shadow-sm">
                   <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                    {podcast.shortDescription || 'Listen to this amazing podcast episode by ' + podcast.uploaderName + '. Share and enjoy the content on Cryptune.'}
+                    {podcast.shortDescription || 'Listen to this amazing podcast episode by ' + podcast.uploaderName + '. Share and enjoy the content on Velin.'}
                   </p>
                 </div>
                 

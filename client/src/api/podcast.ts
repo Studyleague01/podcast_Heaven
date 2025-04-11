@@ -87,10 +87,15 @@ export async function getChannelInfo(channelId: string): Promise<ChannelResponse
 
 export async function getMoreChannelEpisodes(channelId: string, nextPageToken: string): Promise<SearchResponse> {
   try {
-    const response = await fetchWithTimeout(
-      `${EXTERNAL_API_URL}/nextpage/channel/${channelId}?nextpage=${encodeURIComponent(nextPageToken)}`
-    );
-    return await response.json();
+    console.log('Fetching more channel episodes with token:', nextPageToken);
+    const url = `${EXTERNAL_API_URL}/nextpage/channel/${channelId}?nextpage=${encodeURIComponent(nextPageToken)}`;
+    console.log('Request URL:', url);
+    
+    const response = await fetchWithTimeout(url);
+    const data = await response.json();
+    
+    console.log('Got more channel episodes response:', data);
+    return data;
   } catch (error) {
     console.error('Channel episodes error:', error);
     throw error;
