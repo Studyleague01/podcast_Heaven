@@ -1,6 +1,6 @@
 {
   "short_name": "Cryptune",
-  "name": "Cryptune - Podcast Streaming App",
+  "name": "Cryptune - Horror podcast Streaming App",
   "icons": [
     {
       "src": "favicon.ico",
@@ -24,7 +24,7 @@
       "purpose": "maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "https://shcloud.netlify.app/",
   "display": "standalone",
   "theme_color": "#ff7b00",
   "background_color": "#ffffff",
