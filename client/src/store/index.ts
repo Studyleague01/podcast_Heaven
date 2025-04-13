@@ -43,14 +43,7 @@ export const useAudioPlayerStore = create<AudioPlayerState>((set) => ({
   toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
   setCurrentTime: (currentTime) => set({ currentTime }),
   setDuration: (duration) => set({ duration }),
-  toggleExpanded: () => {
-    console.log("Toggle expanded called in store");
-    set((state) => {
-      const newExpanded = !state.isExpanded;
-      console.log("New expanded state:", newExpanded);
-      return { isExpanded: newExpanded };
-    });
-  },
+  toggleExpanded: () => set((state) => ({ isExpanded: !state.isExpanded })),
   setSleepTimer: (minutes) => set(() => {
     if (minutes === null) {
       return { sleepTimer: null, sleepTimerEndTime: null };

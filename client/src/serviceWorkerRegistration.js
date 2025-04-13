@@ -21,7 +21,7 @@ export function register(config) {
   
   if (shouldRegister) {
     // The URL constructor is available in all browsers that support SW.
-    const publicUrl = new URL(import.meta.env.BASE_URL, window.location.href);
+    const publicUrl = new URL(import.meta.env.BASE_URL || '/', window.location.href);
     if (publicUrl.origin !== window.location.origin) {
       // Our service worker won't work if PUBLIC_URL is on a different origin
       // from what our page is served on. This might happen if a CDN is used to
@@ -30,7 +30,8 @@ export function register(config) {
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `${publicUrl.origin}/service-worker.js`;
+      // Use the current origin to ensure correct path regardless of deployment
+      const swUrl = `${window.location.origin}/service-worker.js`;
       
       console.log('Service Worker URL:', swUrl); // Add debug logging
       
@@ -118,10 +119,11 @@ function checkValidServiceWorker(swUrl, config) {
         console.error('Invalid service worker found. Status:', response.status, 'Content-Type:', contentType);
         
         // Try with a different path if original fails
-        if (swUrl.includes('/src/service-worker.js')) {
-          console.log('Trying alternative service worker path...');
-          const alternativeUrl = swUrl.replace('/src/service-worker.js', '/service-worker.js');
-          checkValidServiceWorker(alternativeUrl, config);
+        const currentOrigin = window.location.origin;
+        // Try different combinations of paths for the service worker
+        console.log('Trying alternative service worker paths...');
+        if (swUrl !== `${currentOrigin}/service-worker.js`) {
+          checkValidServiceWorker(`${currentOrigin}/service-worker.js`, config);
           return;
         }
         

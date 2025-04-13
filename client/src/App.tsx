@@ -1,7 +1,6 @@
 import { Switch, Route, useLocation, useParams } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/Header";
-// Import the lightweight audio player
 import LightAudioPlayer from "@/components/LightAudioPlayer";
 import DirectSharePopup from "@/components/DirectSharePopup";
 import InstallPrompt from "@/components/InstallPrompt";
@@ -13,13 +12,14 @@ import SearchResults from "@/pages/SearchResults";
 import Auth from "@/pages/Auth";
 import NotFound from "@/pages/not-found";
 import TestPage from "@/pages/TestPage";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback, lazy, Suspense } from "react";
 import { Podcast, AudioStream } from "@/types/podcast";
 import { useAudioPlayerStore, useSearchStore, useAuthStore } from "@/store/index";
 import { useShareStore } from "@/lib/useShare";
 import { NetworkContext, NetworkProvider } from "@/contexts/NetworkContext";
+import LoadingIndicator from "@/components/LoadingIndicator";
 
-// Route components for clean mounting
+// Route components using improved props passing and memoization
 const HomeRoute = ({ onPlayPodcast }: { onPlayPodcast: (podcast: Podcast, stream: AudioStream) => void }) => {
   return <Home onPlayPodcast={onPlayPodcast} />;
 };
@@ -47,7 +47,7 @@ const AppContent = () => {
   const [audioStream, setAudioStream] = useState<AudioStream | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const { searchQuery } = useSearchStore();
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
   
   // Use our global share store
   const { sharePodcast } = useShareStore();
@@ -60,7 +60,7 @@ const AppContent = () => {
     return <OfflineFallback />;
   }
 
-  // Effect to initialize player from URL if provided
+  // Effect to initialize player from state store
   useEffect(() => {
     // If we have state in the store, use it
     if (playerStore.currentPodcast && !currentPodcast) {
@@ -70,19 +70,26 @@ const AppContent = () => {
     }
   }, [playerStore, currentPodcast]);
 
-  // Handle URL sharing
+  // Handle URL sharing parameters
+  const [, setLocation] = useLocation();
+  
   useEffect(() => {
-    // Check if we have sharing parameters in the URL
-    const url = new URL(window.location.href);
-    const shareId = url.searchParams.get('share');
-    
-    if (shareId) {
-      // If we have a share ID, navigate to the correct content
-      setLocation(`/podcast/${shareId}`);
+    try {
+      // Check if we have sharing parameters in the URL
+      const url = new URL(window.location.href);
+      const shareId = url.searchParams.get('share');
+      
+      if (shareId) {
+        // If we have a share ID, navigate to the correct content
+        setLocation(`/podcast/${shareId}`);
+      }
+    } catch (error) {
+      console.error('Error processing URL parameters:', error);
     }
   }, [setLocation]);
 
-  const handlePlayPodcast = (podcast: Podcast, stream: AudioStream) => {
+  // Memoize the play podcast handler for performance
+  const handlePlayPodcast = useCallback((podcast: Podcast, stream: AudioStream) => {
     setCurrentPodcast(podcast);
     setAudioStream(stream);
     setIsPlaying(true);
@@ -91,73 +98,72 @@ const AppContent = () => {
     playerStore.setCurrentPodcast(podcast);
     playerStore.setAudioStream(stream);
     playerStore.setIsPlaying(true);
-  };
+  }, [playerStore]);
 
-  // Handle share functionality with our new share system
-  const handleShare = () => {
-    if (!currentPodcast) return;
-
-    console.log('Sharing podcast:', currentPodcast.title);
-    
+  // Memoize the share handler for performance
+  const handleShare = useCallback(() => {
+    if (!currentPodcast) return;    
     // Use our sharePodcast helper from useShareStore
     sharePodcast(currentPodcast);
-  };
+  }, [currentPodcast, sharePodcast]);
 
   const { isAuthenticated } = useAuthStore();
-  const [, navigate] = useLocation();
   
   // Redirect to authentication if not authenticated and not already on the auth page
   useEffect(() => {
-    if (!isAuthenticated && location !== '/auth') {
-      navigate('/auth');
+    const publicPaths = ['/auth', '/test'];
+    if (!isAuthenticated && !publicPaths.includes(location)) {
+      setLocation('/auth');
     }
-  }, [isAuthenticated, location, navigate]);
+  }, [isAuthenticated, location, setLocation]);
   
   // Check if the user is on the auth page
   const isAuthPage = location === '/auth';
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-zinc-900">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-zinc-900 transition-colors duration-300">
       {/* Only show header if authenticated or if not on auth page */}
       <Header isAuthPage={isAuthPage} />
       
-      {/* Main content with YouTube-like padding */}
-      <div className="px-0 lg:px-4 flex-1">
-        {/* Using function components for route rendering to avoid TypeScript issues */}
-        <Switch>
-          {isAuthenticated ? (
-            <>
-              <Route path="/">
-                <HomeRoute onPlayPodcast={handlePlayPodcast} />
-              </Route>
-              <Route path="/search/:query">
-                <SearchRoute onPlayPodcast={handlePlayPodcast} />
-              </Route>
-              <Route path="/podcast/:id">
-                <PodcastRoute onPlayPodcast={handlePlayPodcast} />
-              </Route>
-              <Route path="/channel/:id">
-                <ChannelRoute onPlayPodcast={handlePlayPodcast} />
-              </Route>
-            </>
-          ) : null}
-          
-          {/* Auth route is always accessible */}
-          <Route path="/auth">
-            <Auth />
-          </Route>
-          
-          {/* Test page route - always accessible */}
-          <Route path="/test">
-            <TestPage />
-          </Route>
-          
-          <Route>
-            {isAuthenticated ? <NotFound /> : <Auth />}
-          </Route>
-        </Switch>
+      {/* Main content with improved padding */}
+      <div className="px-0 lg:px-4 flex-1 pb-20 md:pb-24">
+        <Suspense fallback={<div className="flex justify-center py-12"><LoadingIndicator /></div>}>
+          <Switch>
+            {isAuthenticated ? (
+              <>
+                <Route path="/">
+                  <HomeRoute onPlayPodcast={handlePlayPodcast} />
+                </Route>
+                <Route path="/search/:query">
+                  <SearchRoute onPlayPodcast={handlePlayPodcast} />
+                </Route>
+                <Route path="/podcast/:id">
+                  <PodcastRoute onPlayPodcast={handlePlayPodcast} />
+                </Route>
+                <Route path="/channel/:id">
+                  <ChannelRoute onPlayPodcast={handlePlayPodcast} />
+                </Route>
+              </>
+            ) : null}
+            
+            {/* Auth route is always accessible */}
+            <Route path="/auth">
+              <Auth />
+            </Route>
+            
+            {/* Test page route - always accessible */}
+            <Route path="/test">
+              <TestPage />
+            </Route>
+            
+            <Route>
+              {isAuthenticated ? <NotFound /> : <Auth />}
+            </Route>
+          </Switch>
+        </Suspense>
       </div>
       
+      {/* Audio player component with conditional rendering */}
       {currentPodcast && isAuthenticated && (
         <LightAudioPlayer 
           podcast={currentPodcast}
@@ -170,7 +176,7 @@ const AppContent = () => {
       
       <Toaster />
       
-      {/* Direct Share Popup - doesn't rely on Dialog component */}
+      {/* Direct Share Popup */}
       <DirectSharePopup />
     </div>
   );

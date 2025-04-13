@@ -2,8 +2,6 @@ import { useRef, useEffect, useState } from "react";
 import { Podcast, AudioStream } from "@/types/podcast";
 import { formatDuration, getYouTubeThumbnail } from "@/api/podcast";
 
-// Formatted: Apr 12, 2025 - Force cache update
-
 interface LightAudioPlayerProps {
   podcast: Podcast;
   audioStream: AudioStream | null;
@@ -80,7 +78,7 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
     setIsExpanded(!isExpanded);
   };
 
-  // Simplified mini player - keeping original style
+  // Simplified mini player
   if (!isExpanded) {
     return (
       <>
@@ -93,11 +91,11 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
         />
         
         <div 
-          className="fixed bottom-6 left-0 right-0 mx-auto w-[85%] max-w-sm bg-black/75 backdrop-blur-lg z-40 cursor-pointer rounded-2xl shadow-xl border border-gray-800/50 overflow-hidden hover:bg-black/85 transition-all duration-300"
+          className="fixed bottom-6 left-0 right-0 mx-auto w-[85%] max-w-sm bg-black/75 backdrop-blur-lg z-40 cursor-pointer rounded-full shadow-xl border border-gray-800/50 overflow-hidden hover:bg-black/85 transition-all duration-300"
           onClick={toggleExpanded}
         >
           <div className="flex items-center p-2 px-3">
-            {/* Thumbnail - fully circular */}
+            {/* Thumbnail - circular like in example */}
             <div className="w-10 h-10 flex-shrink-0 rounded-full overflow-hidden mr-3 shadow-md border border-white/10">
               <img 
                 src={getYouTubeThumbnail(podcast.url, 'default')} 
@@ -106,13 +104,13 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
               />
             </div>
             
-            {/* Title and artist - white text as in original */}
+            {/* Title and artist - white text as in example */}
             <div className="flex-1 min-w-0 mr-3">
               <h4 className="text-sm font-semibold text-white truncate">{podcast.title}</h4>
               <p className="text-xs text-gray-300 truncate">{podcast.uploaderName}</p>
             </div>
             
-            {/* Play/Pause button - solid orange button */}
+            {/* Play/Pause button - smaller orange button */}
             <div 
               onClick={(e) => {
                 e.stopPropagation(); // Prevent mini-player from expanding when clicking play button
@@ -130,7 +128,7 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
     );
   }
 
-  // Expanded player with clean Spotify-like style
+  // Expanded player with enhanced styling
   return (
     <>
       <audio 
@@ -141,88 +139,77 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
         hidden
       />
       
-      <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-zinc-900 text-white">
-        {/* Simple low-opacity background image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-10" 
-          style={{ 
-            backgroundImage: `url(${getYouTubeThumbnail(podcast.url, 'maxres')})`,
-            filter: 'blur(30px)'
-          }}
-        ></div>
-        
-        {/* Spotify-style Header with Better Spacing */}
-        <div className="sticky top-0 py-4 px-5 flex items-center justify-between bg-black/10 relative z-10">
-          <div className="flex items-center">
-            <button 
-              onClick={toggleExpanded}
-              className="mr-4 w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-all"
-              aria-label="Close fullscreen player"
-            >
-              <span className="material-icons">keyboard_arrow_down</span>
-            </button>
-            <div>
-              <h4 className="text-xs text-gray-400 font-medium">Now Playing</h4>
-              <h3 className="font-medium text-white">
-                {podcast.title.length > 30 ? podcast.title.substring(0, 30) + '...' : podcast.title}
-              </h3>
-            </div>
+      <div className="fixed inset-0 bg-gradient-to-b from-white/95 to-gray-50/95 dark:from-zinc-900/95 dark:to-black/95 backdrop-blur-md z-50 flex flex-col">
+        {/* Elegant glassmorphic header */}
+        <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 sticky top-0 z-10">
+          <button 
+            onClick={toggleExpanded}
+            className="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800/70 rounded-full transition-colors"
+          >
+            <span className="material-icons">keyboard_arrow_down</span>
+          </button>
+          
+          <div className="flex flex-col items-center">
+            <h3 className="font-medium text-sm text-gray-900 dark:text-white">Now Playing</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="text-gray-900 dark:text-white">Crypt</span>
+              <span className="text-orange-500">une</span>
+            </p>
           </div>
           
-          <div className="flex items-center space-x-4">
-            {/* Volume Control Button */}
+          {onShare && (
             <button 
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-all"
-              onClick={() => setIsMuted(!isMuted)}
+              onClick={onShare}
+              className="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800/70 rounded-full transition-colors"
             >
-              <span className="material-icons">
-                {isMuted ? 'volume_off' : volume < 0.3 ? 'volume_down' : 'volume_up'}
-              </span>
+              <span className="material-icons">share</span>
             </button>
-            
-            {/* Share button */}
-            {onShare && (
-              <button 
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-all"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onShare();
-                }}
-                aria-label="Share"
-              >
-                <span className="material-icons">share</span>
-              </button>
-            )}
-          </div>
+          )}
         </div>
         
-        {/* Spotify-style Content Layout */}
-        <div className="flex-1 overflow-auto relative z-10">
-          <div className="p-6 md:p-10 flex flex-col items-center justify-center max-w-3xl mx-auto w-full">
-            {/* Album Art - Rectangular */}
-            <div className="w-72 h-56 md:w-96 md:h-72 mx-auto relative shadow-xl mb-10 rounded-md overflow-hidden">
-              <img 
-                src={getYouTubeThumbnail(podcast.url, 'medium')}
-                alt={podcast.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = podcast.thumbnail;
-                }}
-              />
+        {/* Content - responsive layout with elegant spacing */}
+        <div className="flex-1 overflow-auto">
+          <div className="p-6 md:p-8 flex flex-col lg:flex-row items-center lg:items-start justify-center lg:justify-start lg:space-x-16 max-w-7xl mx-auto w-full">
+            {/* Album art with elegant shadow and subtle hover effect */}
+            <div className="w-full max-w-xs lg:max-w-md mx-auto lg:mx-0 aspect-video rounded-xl overflow-hidden mb-8 lg:mb-0 lg:sticky lg:top-8 elegant-card">
+              <div className="relative w-full h-full group">
+                <img 
+                  src={getYouTubeThumbnail(podcast.url, 'medium')}
+                  alt={podcast.title}
+                  className="w-full h-full object-cover rounded-xl"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = podcast.thumbnail;
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
             </div>
             
-            {/* Clean Song Info */}
-            <div className="flex flex-col items-center mb-8 w-full text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-white mb-2">{podcast.title}</h2>
-              <p className="text-sm text-gray-400">
+            {/* Player controls and info - larger on desktop with elegant spacing */}
+            <div className="flex flex-col w-full max-w-md lg:pt-4 lg:flex-1">
+              {/* Channel info with avatar */}
+              <div className="hidden lg:flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 rounded-full overflow-hidden">
+                  <img 
+                    src={podcast.uploaderAvatar || getYouTubeThumbnail(podcast.url, 'default')} 
+                    alt={podcast.uploaderName}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="text-gray-600 dark:text-gray-400 text-sm font-medium">{podcast.uploaderName}</span>
+                {podcast.uploaderVerified && <span className="material-icons text-orange-500 text-sm">verified</span>}
+              </div>
+              
+              {/* Title with elegant typography */}
+              <h2 className="text-xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center lg:text-left mb-2 leading-tight">{podcast.title}</h2>
+              <p className="text-gray-600 dark:text-gray-400 text-center lg:text-left mb-8 lg:hidden">
                 {podcast.uploaderName}
-                {podcast.uploaderVerified && <span className="material-icons text-orange-500 text-sm ml-1 align-middle">verified</span>}
+                {podcast.uploaderVerified && <span className="material-icons text-orange-500 text-sm ml-1">verified</span>}
               </p>
               
-              {/* Enhanced progress bar */}
-              <div className="w-full max-w-md mx-auto mt-8">
-                <div 
-                  className="w-full h-2.5 bg-white/20 cursor-pointer rounded-full overflow-hidden relative" 
+              {/* YouTube-style progress bar - smoother and more elegant */}
+              <div className="w-full mb-3 mt-2">
+                <div className="youtube-progress-bar w-full h-2 md:h-3 cursor-pointer rounded-full overflow-hidden" 
                   onClick={(e) => {
                     if (audioRef.current) {
                       const rect = e.currentTarget.getBoundingClientRect();
@@ -233,31 +220,20 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
                       setCurrentTime(newTime);
                     }
                   }}
-                >
-                  {/* Orange progress fill */}
-                  <div 
-                    className="absolute top-0 left-0 h-full bg-orange-500 rounded-full"
-                    style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
-                  ></div>
-                  
-                  {/* Playhead dot */}
-                  <div 
-                    className="absolute top-1/2 -translate-y-1/2 h-4 w-4 bg-orange-500 border-2 border-white rounded-full shadow-md"
-                    style={{ left: `calc(${(currentTime / (duration || 1)) * 100}% - 8px)` }}
-                  ></div>
-                </div>
+                  style={{ '--progress': `${(currentTime / (duration || 1)) * 100}%` } as React.CSSProperties}
+                ></div>
               </div>
               
-              {/* Time indicators */}
-              <div className="w-full max-w-md mx-auto flex justify-between text-xs text-gray-400 mt-2 mb-8">
+              {/* Time indicators with improved spacing */}
+              <div className="w-full flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-10">
                 <span>{formatDuration(currentTime)}</span>
                 <span>{formatDuration(duration)}</span>
               </div>
               
-              {/* Simplified Controls */}
-              <div className="flex items-center justify-center space-x-6 md:space-x-8">
+              {/* Controls - elegant and modern */}
+              <div className="flex items-center justify-center lg:justify-start space-x-10 md:space-x-12">
                 <button 
-                  className="p-2 text-white/80 hover:text-white transition-all"
+                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-all hover:scale-110"
                   onClick={() => {
                     const newTime = Math.max(0, currentTime - 10);
                     if (audioRef.current) {
@@ -266,23 +242,20 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
                     }
                   }}
                 >
-                  <span className="material-icons text-2xl">replay_10</span>
+                  <span className="material-icons text-3xl md:text-4xl">replay_10</span>
                 </button>
                 
-                {/* Play button with fixed circular border */}
-                <div className="w-16 h-16 md:w-18 md:h-18 rounded-full border-2 border-orange-500 flex items-center justify-center">
-                  <button 
-                    onClick={() => onTogglePlay(!isPlaying)}
-                    className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-lg"
-                  >
-                    <span className="material-icons text-3xl">
-                      {isPlaying ? 'pause' : 'play_arrow'}
-                    </span>
-                  </button>
-                </div>
+                <button 
+                  onClick={() => onTogglePlay(!isPlaying)}
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-full player-gradient-button text-white flex items-center justify-center hover:scale-105 active:scale-95"
+                >
+                  <span className="material-icons text-3xl md:text-4xl ml-1">
+                    {isPlaying ? 'pause' : 'play_arrow'}
+                  </span>
+                </button>
                 
                 <button 
-                  className="p-2 text-white/80 hover:text-white transition-all"
+                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-all hover:scale-110"
                   onClick={() => {
                     const newTime = Math.min(duration, currentTime + 10);
                     if (audioRef.current) {
@@ -291,8 +264,45 @@ const LightAudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onSha
                     }
                   }}
                 >
-                  <span className="material-icons text-2xl">forward_10</span>
+                  <span className="material-icons text-3xl md:text-4xl">forward_10</span>
                 </button>
+              </div>
+              
+              {/* Additional controls */}
+              <div className="hidden lg:flex justify-center lg:justify-start mt-8 space-x-6">
+                <button className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors">
+                  <span className="material-icons">playlist_add</span>
+                  <span className="text-sm">Add to Playlist</span>
+                </button>
+                <button className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors">
+                  <span className="material-icons">thumb_up_off_alt</span>
+                  <span className="text-sm">Like</span>
+                </button>
+              </div>
+              
+              {/* Episode details - desktop only with elegant card */}
+              <div className="hidden lg:block mt-12 pt-6 border-t border-gray-200 dark:border-zinc-800/50">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                  <span className="material-icons text-orange-500 mr-2">info</span>
+                  About this episode
+                </h3>
+                <div className="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-5 shadow-sm">
+                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                    {podcast.shortDescription || 'Listen to this amazing podcast episode by ' + podcast.uploaderName + '. Share and enjoy the content on Cryptune.'}
+                  </p>
+                </div>
+                
+                {/* Tags section */}
+                <div className="mt-6">
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Tags</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['podcast', 'audio', 'music', 'entertainment'].map((tag, i) => (
+                      <span key={i} className="px-3 py-1 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 rounded-full text-xs">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

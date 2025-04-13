@@ -183,7 +183,7 @@ export function SolidAudioPlayer(props: SolidAudioPlayerProps) {
     );
   }
   
-  // Immersive Fullscreen Player with Wilson React Music Player Style
+  // Expanded player
   return (
     <>
       <audio 
@@ -193,198 +193,114 @@ export function SolidAudioPlayer(props: SolidAudioPlayerProps) {
         onLoadedMetadata={handleLoadedMetadata}
       />
       
-      <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-800 to-black text-white">
-        {/* Dynamic Background with Art-Based Gradient */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30" 
-          style={{ 
-            backgroundImage: `url(${getYouTubeThumbnail(props.podcast.url, 'high')})`,
-            filter: 'blur(180px) saturate(150%)'
-          }}
-        ></div>
+      <div className="fixed inset-0 bg-white dark:bg-zinc-900 z-50 flex flex-col">
+        {/* Header */}
+        <div className="p-4 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
+          <button 
+            onClick={() => setIsExpanded(false)}
+            className="text-gray-500 dark:text-gray-400"
+          >
+            <span className="material-icons">keyboard_arrow_down</span>
+          </button>
+          <h3 className="font-medium text-gray-900 dark:text-white">Now Playing</h3>
+          {props.onShare && (
+            <button 
+              onClick={props.onShare}
+              className="text-gray-500 dark:text-gray-400"
+            >
+              <span className="material-icons">share</span>
+            </button>
+          )}
+        </div>
         
-        {/* Improved Overlay Gradient - more glass-like effect */}
-        <div className="absolute inset-0 backdrop-blur-3xl bg-gradient-to-b from-black/20 via-black/40 to-black/70"></div>
-        
-        {/* Main Content Container with Better Organization */}
-        <div className="relative z-10 flex flex-col h-full max-h-screen">
-          {/* Header with Better Spacing */}
-          <div className="sticky top-0 py-4 px-5 flex items-center justify-between backdrop-blur-md bg-black/30">
-            <div className="flex items-center">
-              <button 
-                onClick={() => setIsExpanded(false)}
-                className="mr-4 w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-all"
-                aria-label="Close fullscreen player"
-              >
-                <span className="material-icons">keyboard_arrow_down</span>
-              </button>
-              <div>
-                <h4 className="text-xs text-gray-400 font-medium">Now Playing</h4>
-                <h3 className="font-medium text-white">
-                  {props.podcast.title.length > 30 ? props.podcast.title.substring(0, 30) + '...' : props.podcast.title}
-                </h3>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {/* Volume Control Button */}
-              <button 
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-all"
-                onClick={toggleMute}
-              >
-                <span className="material-icons">
-                  {isMuted() ? 'volume_off' : volume() < 0.3 ? 'volume_down' : 'volume_up'}
-                </span>
-              </button>
-              
-              {/* Share button */}
-              {props.onShare && (
-                <button 
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-all"
-                  onClick={props.onShare}
-                  aria-label="Share"
-                >
-                  <span className="material-icons">share</span>
-                </button>
-              )}
-            </div>
+        {/* Content */}
+        <div className="flex-1 overflow-auto p-4 flex flex-col items-center justify-center">
+          {/* Album art */}
+          <div className="w-full max-w-xs mx-auto aspect-video rounded-lg overflow-hidden mb-6">
+            <img 
+              src={getYouTubeThumbnail(props.podcast.url, 'medium')}
+              alt={props.podcast.title}
+              className="w-full h-full object-cover"
+            />
           </div>
-
-          {/* Main Content Area with Better Spacing and Layout */}
-          <div className="flex flex-col items-center justify-between h-full py-6 px-4 overflow-hidden">
-            {/* Larger Album Art Container with Better Aspect Ratio for Mobile */}
-            <div className="w-full max-w-md px-4 flex-shrink-0 mb-8">
-              <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.2)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] mx-auto aspect-square transform transition-transform duration-700 group">
-                {/* Album Art Image */}
-                <img 
-                  src={getYouTubeThumbnail(props.podcast.url, 'high')}
-                  alt={props.podcast.title}
-                  className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105" 
-                />
-                
-                {/* Enhanced Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                
-                {/* Playback Info with Better Typography */}
-                <div className="absolute bottom-6 left-6 flex items-center text-white text-sm backdrop-blur-sm bg-black/30 px-3 py-1.5 rounded-full">
-                  <span className="material-icons mr-1.5 text-orange-400 text-sm">equalizer</span>
-                  <span className="font-medium tracking-wide">{formatTime(currentTime())} / {formatTime(duration())}</span>
-                </div>
-                
-                {/* Enhanced Play Button Overlay */}
-                {!props.isPlaying && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <button 
-                      className="w-24 h-24 rounded-full bg-black/75 hover:bg-orange-500 text-white flex items-center justify-center shadow-2xl transition-all transform hover:scale-110 border border-white/20 backdrop-blur-md"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        props.onTogglePlay(true);
-                      }}
-                    >
-                      <span className="material-icons text-5xl ml-1.5">play_arrow</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+          
+          {/* Title */}
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">{props.podcast.title}</h2>
+          <p className="text-gray-700 dark:text-gray-300 text-center mb-6">
+            {props.podcast.uploaderName}
+            {props.podcast.uploaderVerified && <span className="material-icons text-blue-500 text-sm ml-1">verified</span>}
+          </p>
+          
+          {/* Progress */}
+          <div className="w-full max-w-md mb-2 bg-gray-200 dark:bg-zinc-700 h-2 rounded-full cursor-pointer" 
+               ref={setProgressBarRef}
+               onClick={handleProgressBarClick}>
+            <div 
+              className="h-full bg-blue-500 rounded-full" 
+              style={{ width: `${duration() ? (currentTime() / duration() * 100) : 0}%` }}
+            />
+          </div>
+          
+          {/* Time indicators */}
+          <div className="w-full max-w-md flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-8">
+            <span>{formatTime(currentTime())}</span>
+            <span>{formatTime(duration())}</span>
+          </div>
+          
+          {/* Controls */}
+          <div className="flex items-center justify-center space-x-6">
+            <button 
+              className="p-2 text-gray-800 dark:text-gray-200"
+              onClick={() => {
+                if (audioRef) {
+                  const newTime = Math.max(0, currentTime() - 10);
+                  audioRef.currentTime = newTime;
+                  setCurrentTime(newTime);
+                }
+              }}
+            >
+              <span className="material-icons text-2xl">replay_10</span>
+            </button>
             
-            {/* Podcast Info */}
-            <div className="w-full max-w-lg text-center mb-6 px-4 flex-shrink-0">
-              <h1 className="text-white text-2xl md:text-3xl font-bold mb-3 leading-tight tracking-tight">{props.podcast.title}</h1>
-              <div className="flex items-center justify-center">
-                <span className="w-7 h-7 bg-orange-500 rounded-full flex items-center justify-center text-white mr-2 shadow-md">
-                  <span className="material-icons text-sm">person</span>
-                </span>
-                <p className="text-gray-300 text-base md:text-lg flex items-center">
-                  <span>{props.podcast.uploaderName}</span>
-                  {props.podcast.uploaderVerified && (
-                    <span className="material-icons text-blue-400 text-sm ml-1">verified</span>
-                  )}
-                </p>
-              </div>
-            </div>
+            <button 
+              onClick={() => props.onTogglePlay(!props.isPlaying)}
+              className="w-16 h-16 rounded-full bg-blue-500 text-white flex items-center justify-center"
+            >
+              <span className="material-icons text-3xl">
+                {props.isPlaying ? 'pause' : 'play_arrow'}
+              </span>
+            </button>
             
-            {/* Controls Section with Better Position and Spacing */}
-            <div className="w-full max-w-md px-4 mt-auto flex-shrink-0">
-              {/* Improved Progress Controls */}
-              <div className="w-full mb-8">
-                {/* Progress bar */}
-                <div className="w-full cursor-pointer h-1.5 bg-gray-600 rounded-full" 
-                     ref={setProgressBarRef}
-                     onClick={handleProgressBarClick}>
-                  <div 
-                    className="h-full rounded-full" 
-                    style={{ 
-                      width: `${duration() ? (currentTime() / duration() * 100) : 0}%`,
-                      background: '#f97316'
-                    }}
-                  />
-                </div>
-                
-                {/* Time indicators */}
-                <div className="flex justify-between text-gray-400 mt-2 text-xs font-medium">
-                  <span>{formatTime(currentTime())}</span>
-                  <span>{formatTime(duration())}</span>
-                </div>
-              </div>
-              
-              {/* Media Controls */}
-              <div className="flex items-center justify-center w-full mb-4">
-                <button 
-                  className="text-gray-400 hover:text-white p-4 rounded-full transition-all duration-300 mx-3 md:mx-6"
-                  onClick={() => {
-                    if (audioRef) {
-                      const newTime = Math.max(0, currentTime() - 15);
-                      audioRef.currentTime = newTime;
-                      setCurrentTime(newTime);
-                    }
-                  }}
-                >
-                  <span className="material-icons text-3xl">replay_15</span>
-                </button>
-                
-                <button 
-                  className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white text-black flex items-center justify-center shadow-xl hover:scale-105 hover:bg-orange-500 hover:text-white transition-all duration-200"
-                  onClick={() => props.onTogglePlay(!props.isPlaying)}
-                >
-                  <span className="material-icons text-3xl md:text-4xl ml-0.5">
-                    {props.isPlaying ? 'pause' : 'play_arrow'}
-                  </span>
-                </button>
-                
-                <button 
-                  className="text-gray-400 hover:text-white p-4 rounded-full transition-all duration-300 mx-3 md:mx-6"
-                  onClick={() => {
-                    if (audioRef) {
-                      const newTime = Math.min(duration(), currentTime() + 15);
-                      audioRef.currentTime = newTime;
-                      setCurrentTime(newTime);
-                    }
-                  }}
-                >
-                  <span className="material-icons text-3xl">forward_15</span>
-                </button>
-              </div>
-              
-              {/* Volume Slider */}
-              <div className="w-full max-w-xs mx-auto flex items-center space-x-3 mb-2">
-                <span className="material-icons text-gray-400 hover:text-white cursor-pointer" onClick={toggleMute}>
-                  {isMuted() ? 'volume_off' : volume() < 0.3 ? 'volume_down' : 'volume_up'}
-                </span>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={isMuted() ? 0 : volume()}
-                  onInput={handleVolumeChange}
-                  className="w-full h-1.5 appearance-none bg-gray-600 rounded-full cursor-pointer"
-                  style={{
-                    background: `linear-gradient(to right, #f97316 ${(isMuted() ? 0 : volume()) * 100}%, #3d3d3d ${(isMuted() ? 0 : volume()) * 100}%)`
-                  }}
-                />
-              </div>
-            </div>
+            <button 
+              className="p-2 text-gray-800 dark:text-gray-200"
+              onClick={() => {
+                if (audioRef) {
+                  const newTime = Math.min(duration(), currentTime() + 10);
+                  audioRef.currentTime = newTime;
+                  setCurrentTime(newTime);
+                }
+              }}
+            >
+              <span className="material-icons text-2xl">forward_10</span>
+            </button>
+          </div>
+          
+          {/* Volume control */}
+          <div className="flex items-center space-x-2 mt-8">
+            <button onClick={toggleMute} className="text-gray-700 dark:text-gray-300">
+              <span className="material-icons">
+                {isMuted() ? 'volume_off' : volume() < 0.5 ? 'volume_down' : 'volume_up'}
+              </span>
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={isMuted() ? 0 : volume()}
+              onInput={handleVolumeChange}
+              className="w-24 h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-full appearance-none cursor-pointer"
+            />
           </div>
         </div>
       </div>

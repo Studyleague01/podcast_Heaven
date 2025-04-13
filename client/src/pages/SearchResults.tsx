@@ -79,9 +79,9 @@ const SearchResults = ({ query, onPlayPodcast }: SearchResultsProps) => {
   };
   
   return (
-    <main className="flex-grow pb-20 bg-white dark:bg-black text-gray-900 dark:text-white">
+    <main className="flex-grow pb-20 dark:bg-black">
       {/* Search Header with Back Button */}
-      <div className="w-full py-6 shadow-md relative z-10 bg-white dark:bg-black">
+      <div className="w-full py-6 shadow-md relative z-10 dark:bg-black">
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between">
             <div className="flex items-center mb-2 sm:mb-0">
@@ -97,7 +97,7 @@ const SearchResults = ({ query, onPlayPodcast }: SearchResultsProps) => {
               >
                 <span className="material-icons">arrow_back</span>
               </button>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-foreground">
                 Results for "<span className="text-orange-500 dark:text-orange-400">{query}</span>"
               </h1>
             </div>

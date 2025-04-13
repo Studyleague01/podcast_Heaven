@@ -29,7 +29,7 @@ serviceWorkerRegistration.register({
     }
   },
   onSuccess: (registration) => {
-    console.log('Cryptune is now available offline!', registration);
+    console.log('Velin is now available offline!', registration);
     
     // Force skip waiting to help with installation
     if (registration && registration.waiting) {
