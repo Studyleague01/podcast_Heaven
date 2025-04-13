@@ -62,6 +62,12 @@ const channelsData = {
     "avatarUrl": "https://pol1.piproxy.ggtyler.dev/ytc/AIdro_lppItEBAVxYU9Nz7yOzKSyi3pDwFzEXpDkUMERbbkeAmw=s160-c-k-c0x00ffffff-no-rw?host=yt3.googleusercontent.com",
     "subscriberCount": "3.95M",
     "verified": true,
+  },
+  "UCz67TNWBqU38S8VRvjDO2wg": {
+    "name": "Khooni Monday",
+    "avatarUrl": "https://pol1.piproxy.ggtyler.dev/ytc/AIdro_mQVLyUUhUVhxLq75TkfalSsWuDdCbOe7eeMa-oxx-b94c=s160-c-k-c0x00ffffff-no-rw?host=yt3.googleusercontent.com",
+    "subscriberCount": 5680000,
+    "verified": true,
   }
 };
 
