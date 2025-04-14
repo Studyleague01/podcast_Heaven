@@ -14,10 +14,11 @@ const { clientsClaim } = workbox.core;
 const { ExpirationPlugin } = workbox.expiration;
 const { precacheAndRoute, createHandlerBoundToURL } = workbox.precaching;
 const { registerRoute } = workbox.routing;
-const { StaleWhileRevalidate, CacheFirst } = workbox.strategies;
+const { StaleWhileRevalidate, CacheFirst, NetworkFirst } = workbox.strategies;
 
 // Immediately take control of the page to avoid waiting for reload
 clientsClaim();
+self.skipWaiting();
 
 // Define a manual manifest if __WB_MANIFEST is not available
 // Define core assets to cache
@@ -29,6 +30,8 @@ const CORE_ASSETS = [
   { url: '/logo192.png', revision: '1' },
   { url: '/logo512.png', revision: '1' },
   { url: '/maskable_icon.png', revision: '1' },
+  { url: '/assets/index.css', revision: '1' },
+  { url: '/assets/index.js', revision: '1' },
 ];
 
 // Add current path-based assets

@@ -90,24 +90,27 @@ const InstallPrompt: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-zinc-800 shadow-lg z-50 p-4 border-t border-gray-200 dark:border-zinc-700">
+    <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-zinc-900 shadow-lg z-50 p-4 border-t border-gray-200 dark:border-zinc-800 animate-fade-in-up">
       <div className="max-w-screen-lg mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center">
-          <span className="material-icons text-orange-500 mr-3 text-xl">add_to_home_screen</span>
-          <p className="text-gray-800 dark:text-gray-200">Install Velin on your device for quick access and offline use!</p>
+          <span className="material-icons text-amber-600 dark:text-orange-500 mr-3 text-2xl animate-gently-bounce">add_to_home_screen</span>
+          <div>
+            <p className="text-gray-800 dark:text-gray-100 font-medium">Install Cryptune</p>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">Get quick access and enjoy offline listening!</p>
+          </div>
         </div>
         <div className="flex space-x-3">
           <button 
             onClick={handleInstallClick}
-            className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-medium transition-colors"
+            className="px-5 py-2 player-gradient-button text-white rounded-full font-medium shadow-md hover:shadow-lg transform transition-all active:scale-95"
           >
-            Install
+            Install Now
           </button>
           <button 
             onClick={() => setShowPrompt(false)}
-            className="px-5 py-2 bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300 dark:hover:bg-zinc-600 text-gray-800 dark:text-gray-200 rounded-full font-medium transition-colors"
+            className="px-5 py-2 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-800 dark:text-gray-200 rounded-full font-medium transition-all"
           >
-            Not now
+            Maybe Later
           </button>
         </div>
       </div>

@@ -59,10 +59,10 @@ const Header = memo(({ isAuthPage }: HeaderProps) => {
             className="flex items-center cursor-pointer group mr-2" 
             onClick={goToHome}
           >
-            <span className="material-icons text-orange-500 mr-1.5 group-hover:text-orange-600 transition-colors text-2xl group-hover:animate-pulse">headphones</span>
+            <span className="material-icons text-orange-500 mr-1.5 group-hover:text-orange-600 transition-colors text-2xl group-hover:animate-pulse">music_note</span>
             <h1 className="text-xl font-bold tracking-tight">
-              <span className="text-gray-900 dark:text-white transition-colors duration-300">Vel</span>
-              <span className="text-orange-500 group-hover:text-orange-600 transition-colors">in</span>
+              <span className="text-gray-900 dark:text-white transition-colors duration-300">Cryp</span>
+              <span className="text-orange-500 group-hover:text-orange-600 transition-colors">tune</span>
             </h1>
           </div>
         </div>
@@ -81,7 +81,7 @@ const Header = memo(({ isAuthPage }: HeaderProps) => {
             <button 
               className="flex items-center justify-center px-2 py-1 text-gray-700 dark:text-gray-200 hover:text-orange-500 dark:hover:text-orange-400 transition-colors group rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800"
               aria-label="Create podcast"
-              onClick={() => {/* Implement podcast creation */}}
+              onClick={() => setLocation('/create')}
             >
               <span className="material-icons mr-1 text-lg">add_circle</span>
               <span className="hidden sm:inline text-sm font-medium">Create</span>

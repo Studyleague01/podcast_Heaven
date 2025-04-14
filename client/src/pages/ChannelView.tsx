@@ -57,11 +57,13 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
       
       // Improved error handling and fetch with timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
       
       try {
         // Use the complete URL with proper error handling
         const nextPageUrl = `https://backendmix-emergeny.vercel.app/nextpage/channel/${id}?nextpage=${encodeURIComponent(nextPageToken)}`;
+        
+        console.log('Fetching more episodes from:', nextPageUrl);
         
         // Make fetch request with timeout
         const response = await fetch(nextPageUrl, {
@@ -76,29 +78,35 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
         }
         
         const jsonData = await response.json();
+        console.log('Received pagination data:', jsonData);
         
         // Handle empty or invalid response
         if (!jsonData) {
           throw new Error('Empty response from server');
         }
         
-        if (jsonData && jsonData.items && jsonData.items.length > 0) {
+        // Process the response format from the example
+        if (jsonData.relatedStreams && jsonData.relatedStreams.length > 0) {
           // Use functional update for state to avoid race conditions
           setAllEpisodes(prev => {
             // Filter out duplicates using Set and URL as unique identifier
             const existingUrls = new Set(prev.map(p => p.url));
-            const newEpisodes = jsonData.items.filter((item: Podcast) => !existingUrls.has(item.url));
+            const newEpisodes = jsonData.relatedStreams.filter((item: Podcast) => !existingUrls.has(item.url));
+            console.log(`Adding ${newEpisodes.length} new episodes`);
             return [...prev, ...newEpisodes];
           });
           
           // Update the next page token if available
           if (jsonData.nextpage) {
+            console.log('Setting next page token:', jsonData.nextpage);
             setNextPageToken(jsonData.nextpage);
           } else {
             // No more pages
+            console.log('No more pages available');
             setNextPageToken(undefined);
           }
         } else {
+          console.log('No related streams found in the response');
           // No more items
           setNextPageToken(undefined);
         }

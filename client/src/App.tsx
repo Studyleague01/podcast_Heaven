@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import LightAudioPlayer from "@/components/LightAudioPlayer";
 import DirectSharePopup from "@/components/DirectSharePopup";
 import InstallPrompt from "@/components/InstallPrompt";
+import UpdatePrompt from "@/components/UpdatePrompt";
 import OfflineFallback from "@/components/OfflineFallback";
 import Home from "@/pages/Home";
 import PodcastDetail from "@/pages/PodcastDetail";
@@ -11,6 +12,7 @@ import ChannelView from "@/pages/ChannelView";
 import SearchResults from "@/pages/SearchResults";
 import Auth from "@/pages/Auth";
 import NotFound from "@/pages/not-found";
+import CreatePage from "@/pages/CreatePage";
 
 import { useState, useEffect, useContext, useCallback, lazy, Suspense } from "react";
 import { Podcast, AudioStream } from "@/types/podcast";
@@ -143,6 +145,9 @@ const AppContent = () => {
                 <Route path="/channel/:id">
                   <ChannelRoute onPlayPodcast={handlePlayPodcast} />
                 </Route>
+                <Route path="/create">
+                  <CreatePage />
+                </Route>
               </>
             ) : null}
             
@@ -185,6 +190,7 @@ const App = () => {
     <NetworkProvider>
       <AppContent />
       <InstallPrompt />
+      <UpdatePrompt />
     </NetworkProvider>
   );
 };
