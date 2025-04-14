@@ -125,7 +125,7 @@ const AuthForms = () => {
         
         toast({
           title: "Registration successful",
-          description: `Welcome to Podcast Heaven, ${data.name}!`,
+          description: `Welcome to Velin, ${data.name}!`,
         });
         
         // Switch to login tab after successful registration
@@ -160,10 +160,10 @@ const AuthForms = () => {
             <span className="material-icons text-red-600 text-4xl">podcasts</span>
           </div>
           <CardTitle className="text-2xl font-bold text-center text-gray-900 dark:text-white">
-            Welcome to <span className="text-gray-900 dark:text-white font-normal">Podcast Heaven</span>
+            Welcome to <span className="text-gray-900 dark:text-white font-normal">Velin</span>
           </CardTitle>
           <CardDescription className="text-center text-gray-600 dark:text-gray-400">
-            Sign in to continue to Podcast Heaven
+            Sign in to continue to Velin
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">

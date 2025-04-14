@@ -15,7 +15,7 @@ const GlobalSharePopup = () => {
   // Local state to ensure the component is always rendered
   const [showPopup, setShowPopup] = useState(false);
   const [localContent, setLocalContent] = useState<LocalShareContent>({
-    title: 'Podcast Heaven',
+    title: 'Velin',
     url: window.location.origin
   });
   

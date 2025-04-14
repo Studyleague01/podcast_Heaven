@@ -347,12 +347,17 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
           )}
         </div>
         
-        {/* Featured Podcasts Section - Enhanced Grid */}
+        {/* Featured Podcasts Section - YouTube-Inspired Grid */}
         <div className="mb-10">
-          <h2 className="text-2xl font-bold mb-6 text-white flex items-center">
-            <span className="material-icons mr-2 text-orange-500">star</span>
-            Featured Podcasts
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white flex items-center">
+              <span className="material-icons mr-2 text-orange-500">star</span>
+              Featured Podcasts
+            </h2>
+            <button className="text-sm text-orange-400 hover:text-orange-300 flex items-center">
+              See all <span className="material-icons ml-1 text-base">chevron_right</span>
+            </button>
+          </div>
           
           {featuredQuery.isLoading ? (
             <div className="flex justify-center py-8">
@@ -361,12 +366,13 @@ const Home = ({ onPlayPodcast }: HomeProps) => {
           ) : (
             <>
               {processedFeatured.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                   {processedFeatured.map((podcast, index) => (
                     <PodcastCard 
                       key={`featured-${podcast.url}-${index}`} 
                       podcast={podcast} 
                       onClick={() => handlePlayPodcast(podcast)}
+                      priority={index < 4} // Only prioritize loading for first 4 items
                     />
                   ))}
                 </div>

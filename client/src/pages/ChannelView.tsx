@@ -54,36 +54,64 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
     
     try {
       setIsLoading(true);
-      console.log('Loading more with token:', nextPageToken);
       
-      // Use the complete URL for debugging
-      const nextPageUrl = `https://backendmix-emergeny.vercel.app/nextpage/channel/${id}?nextpage=${encodeURIComponent(nextPageToken)}`;
-      console.log('Next page URL:', nextPageUrl);
+      // Improved error handling and fetch with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
-      // Make a direct fetch request to see the raw response
-      const response = await fetch(nextPageUrl);
-      const jsonData = await response.json();
-      console.log('Next page response:', jsonData);
-      
-      if (jsonData && jsonData.items && jsonData.items.length > 0) {
-        // Append the new items to our existing episodes
-        setAllEpisodes(prev => [...prev, ...jsonData.items]);
+      try {
+        // Use the complete URL with proper error handling
+        const nextPageUrl = `https://backendmix-emergeny.vercel.app/nextpage/channel/${id}?nextpage=${encodeURIComponent(nextPageToken)}`;
         
-        // Update the next page token if available
-        if (jsonData.nextpage) {
-          setNextPageToken(jsonData.nextpage);
+        // Make fetch request with timeout
+        const response = await fetch(nextPageUrl, {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+        }
+        
+        const jsonData = await response.json();
+        
+        // Handle empty or invalid response
+        if (!jsonData) {
+          throw new Error('Empty response from server');
+        }
+        
+        if (jsonData && jsonData.items && jsonData.items.length > 0) {
+          // Use functional update for state to avoid race conditions
+          setAllEpisodes(prev => {
+            // Filter out duplicates using Set and URL as unique identifier
+            const existingUrls = new Set(prev.map(p => p.url));
+            const newEpisodes = jsonData.items.filter((item: Podcast) => !existingUrls.has(item.url));
+            return [...prev, ...newEpisodes];
+          });
+          
+          // Update the next page token if available
+          if (jsonData.nextpage) {
+            setNextPageToken(jsonData.nextpage);
+          } else {
+            // No more pages
+            setNextPageToken(undefined);
+          }
         } else {
-          // No more pages
+          // No more items
           setNextPageToken(undefined);
         }
-      } else {
-        // No more items or error
-        setNextPageToken(undefined);
+      } catch (fetchError: unknown) {
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          throw new Error('Request timed out. Please try again.');
+        }
+        throw fetchError;
       }
-    } catch (err) {
-      console.error('Error loading more:', err);
-      setError('Failed to load more episodes');
-      setNextPageToken(undefined);
+    } catch (err: unknown) {
+      console.error('Error loading more episodes:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Failed to load more episodes: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +143,7 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
       } else {
         throw new Error('No audio streams available');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setError('Failed to play podcast. Please try again.');
       console.error('Play podcast error:', err);
     } finally {
@@ -209,30 +237,41 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
         <h3 className="text-xl font-medium mb-4 text-foreground">Channel Episodes</h3>
         
         {allEpisodes && allEpisodes.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {allEpisodes.map((podcast: Podcast, index: number) => (
               <PodcastCard 
                 key={`${podcast.url}-${index}`} 
                 podcast={podcast}
                 onClick={() => handlePlayPodcast(podcast)}
+                priority={index < 8} // Prioritize loading first 8 for better performance
               />
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <span className="material-icons text-3xl mb-2 text-orange-500/70">podcasts</span>
+          <div className="text-center py-8 text-muted-foreground bg-zinc-900/50 rounded-lg p-10 shadow-sm">
+            <span className="material-icons text-5xl mb-3 text-orange-500/70">podcasts</span>
             <p>No episodes found for this channel</p>
           </div>
         )}
         
         {nextPageToken && (
-          <div className="mt-6 text-center">
+          <div className="mt-8 text-center">
             <button 
-              className="bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white px-6 py-2 rounded-full shadow-md transition-colors duration-200"
+              className="bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white px-8 py-3 rounded-full shadow-md transition-colors duration-200 flex items-center mx-auto"
               onClick={handleLoadMore}
               disabled={isLoading}
             >
-              {isLoading ? 'Loading...' : 'Load More'}
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <span className="material-icons mr-2">expand_more</span>
+                  Load More
+                </>
+              )}
             </button>
           </div>
         )}

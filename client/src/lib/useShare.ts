@@ -69,7 +69,7 @@ export const useShareStore = create<ShareStore>((set, get) => ({
   
   shareApp: () => {
     get().openShare({
-      title: 'Podcast Heaven',
+      title: 'Velin',
       url: window.location.origin,
       type: 'app'
     });

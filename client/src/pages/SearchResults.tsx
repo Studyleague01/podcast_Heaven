@@ -114,12 +114,13 @@ const SearchResults = ({ query, onPlayPodcast }: SearchResultsProps) => {
           ) : (
             <>
               {searchQuery.data?.items && searchQuery.data.items.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                   {searchQuery.data.items.map((podcast, index) => (
                     <PodcastCard 
                       key={`search-${podcast.url}-${index}`} 
                       podcast={podcast} 
                       onClick={() => handlePlayPodcast(podcast)}
+                      priority={index < 8} // Prioritize first 8 results for better performance
                     />
                   ))}
                 </div>

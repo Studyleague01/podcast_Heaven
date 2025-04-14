@@ -11,7 +11,7 @@ import ChannelView from "@/pages/ChannelView";
 import SearchResults from "@/pages/SearchResults";
 import Auth from "@/pages/Auth";
 import NotFound from "@/pages/not-found";
-import TestPage from "@/pages/TestPage";
+
 import { useState, useEffect, useContext, useCallback, lazy, Suspense } from "react";
 import { Podcast, AudioStream } from "@/types/podcast";
 import { useAudioPlayerStore, useSearchStore, useAuthStore } from "@/store/index";
@@ -111,7 +111,7 @@ const AppContent = () => {
   
   // Redirect to authentication if not authenticated and not already on the auth page
   useEffect(() => {
-    const publicPaths = ['/auth', '/test'];
+    const publicPaths = ['/auth'];
     if (!isAuthenticated && !publicPaths.includes(location)) {
       setLocation('/auth');
     }
@@ -151,10 +151,7 @@ const AppContent = () => {
               <Auth />
             </Route>
             
-            {/* Test page route - always accessible */}
-            <Route path="/test">
-              <TestPage />
-            </Route>
+            {/* No test page needed */}
             
             <Route>
               {isAuthenticated ? <NotFound /> : <Auth />}

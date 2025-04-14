@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { Podcast } from "@/types/podcast";
 import { extractVideoIdFromUrl, formatDuration, formatViews, getYouTubeThumbnail } from "@/api/podcast";
-import { memo, useCallback, useState } from "react";
+import React, { memo, useCallback, useState, useRef, useEffect, useMemo } from "react";
 
 interface PodcastCardProps {
   podcast: Podcast;
@@ -10,58 +10,110 @@ interface PodcastCardProps {
   priority?: boolean;
 }
 
+// Cache for already loaded images to prevent unnecessary reloads
+const loadedImages = new Set<string>();
+
 const PodcastCard = memo(({ podcast, onClick, compact = false, priority = false }: PodcastCardProps) => {
   const [, setLocation] = useLocation();
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(() => {
+    // Check if the image was already loaded previously
+    const videoId = extractVideoIdFromUrl(podcast.url);
+    return loadedImages.has(videoId || '');
+  });
   const [imageError, setImageError] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
+  
+  // Get video ID once and store it
+  const videoId = extractVideoIdFromUrl(podcast.url);
   
   // Handle navigation to podcast detail
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    // For better performance, prevent default and use programmatic navigation
+    e.preventDefault();
+    
     if (onClick) {
       onClick();
-    } else {
-      const videoId = extractVideoIdFromUrl(podcast.url);
-      if (videoId) {
-        setLocation(`/podcast/${videoId}`);
-      }
+    } else if (videoId) {
+      setLocation(`/podcast/${videoId}`);
     }
-  }, [onClick, podcast.url, setLocation]);
+  }, [onClick, videoId, setLocation]);
   
-  // Thumbnail loading handlers
+  // Thumbnail loading handlers - optimized
   const handleImageLoad = useCallback(() => {
     setImageLoaded(true);
-  }, []);
+    if (videoId) {
+      loadedImages.add(videoId);
+    }
+  }, [videoId]);
   
   const handleImageError = useCallback(() => {
     setImageError(true);
+    
     // Fallback to the original thumbnail from API
-    const img = document.getElementById(`podcast-thumb-${extractVideoIdFromUrl(podcast.url)}`) as HTMLImageElement;
-    if (img) {
-      img.src = podcast.thumbnail;
+    if (imageRef.current) {
+      imageRef.current.src = podcast.thumbnail;
     }
-  }, [podcast.thumbnail, podcast.url]);
+  }, [podcast.thumbnail]);
+  
+  // Only update thumbnail src when needed - performance optimization
+  const thumbnailSrc = useMemo(() => {
+    return getYouTubeThumbnail(podcast.url, 'medium');
+  }, [podcast.url]);
+  
+  // Use IntersectionObserver for lazy loading
+  useEffect(() => {
+    // If the image is already loaded or has priority, skip the observer
+    if (imageLoaded || priority || !imageRef.current) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && imageRef.current) {
+            // Only set the src when the element is in view
+            if (!imageRef.current.src) {
+              imageRef.current.src = thumbnailSrc;
+            }
+            observer.unobserve(imageRef.current);
+          }
+        });
+      },
+      { rootMargin: '200px' } // Load when within 200px of viewport
+    );
+    
+    observer.observe(imageRef.current);
+    
+    return () => {
+      if (imageRef.current) {
+        observer.unobserve(imageRef.current);
+      }
+    };
+  }, [imageLoaded, priority, thumbnailSrc]);
   
   return (
     <article 
-      className={`group bg-transparent w-full cursor-pointer transition-transform hover:scale-[1.02] duration-200 ${
+      className={`group bg-transparent w-full cursor-pointer transition-transform hover:scale-[1.02] duration-200 will-change-transform ${
         compact ? 'flex gap-4' : ''
       }`}
       onClick={handleClick}
     >
       {/* Thumbnail container with aspect ratio */}
       <div className={`relative ${compact ? 'w-32 h-20 flex-shrink-0' : 'pb-[56.25%] mb-3'} rounded-xl overflow-hidden shadow-md`}>
-        {/* Skeleton loader */}
-        <div className={`absolute inset-0 bg-gray-200 dark:bg-zinc-800 animate-pulse ${imageLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}></div>
+        {/* Native loading skeleton */}
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-gray-200 dark:bg-zinc-800 animate-pulse"></div>
+        )}
         
         {/* YouTube style thumbnail with optimized loading */}
         <img 
-          id={`podcast-thumb-${extractVideoIdFromUrl(podcast.url)}`}
-          src={getYouTubeThumbnail(podcast.url, 'medium')} 
-          alt={podcast.title} 
+          ref={imageRef}
+          src={priority ? thumbnailSrc : (imageLoaded ? thumbnailSrc : '')} 
+          alt=""
           loading={priority ? "eager" : "lazy"}
           decoding="async"
-          className={`absolute w-full h-full object-cover transform transition-all duration-300 ${
-            imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+          width={compact ? 128 : 320}
+          height={compact ? 80 : 180}
+          className={`absolute w-full h-full object-cover transform transition-opacity duration-200 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           onLoad={handleImageLoad}
           onError={handleImageError}
@@ -72,7 +124,7 @@ const PodcastCard = memo(({ podcast, onClick, compact = false, priority = false 
           {formatDuration(podcast.duration)}
         </div>
         
-        {/* Watch Later button */}
+        {/* Watch Later button - only shown on hover */}
         {!compact && (
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button 
@@ -88,7 +140,7 @@ const PodcastCard = memo(({ podcast, onClick, compact = false, priority = false 
           </div>
         )}
         
-        {/* Play button overlay */}
+        {/* Play button overlay - optimization: only render on hover with CSS */}
         <div 
           className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/10 group-hover:bg-black/20 transition-all duration-300"
           aria-hidden="true"
@@ -99,32 +151,25 @@ const PodcastCard = memo(({ podcast, onClick, compact = false, priority = false 
         </div>
       </div>
       
-      {/* Content area */}
+      {/* Content area - simplified for better performance */}
       <div className={compact ? 'flex-1 min-w-0' : 'flex'}>
-        {!compact && (
-          /* Channel avatar - only in full mode */
+        {!compact && podcast.uploaderAvatar && (
+          /* Channel avatar - only in full mode and only if available */
           <div className="w-9 h-9 flex-shrink-0 mr-3 mt-0.5 rounded-full overflow-hidden bg-gray-200 dark:bg-zinc-800">
-            {podcast.uploaderAvatar ? (
-              <img 
-                src={podcast.uploaderAvatar} 
-                alt={podcast.uploaderName} 
-                className="w-full h-full object-cover"
-                loading="lazy"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(podcast.uploaderName.substring(0, 2))}&background=random&size=36`;
-                }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                <span className="material-icons text-base">person</span>
-              </div>
-            )}
+            <img 
+              src={podcast.uploaderAvatar} 
+              alt=""
+              width={36}
+              height={36}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
         )}
         
         <div className={`${compact ? '' : 'flex-1 min-w-0'}`}>
-          {/* Title */}
-          <h3 className={`font-medium ${compact ? 'text-sm line-clamp-1' : 'text-base line-clamp-2'} text-gray-900 dark:text-white mb-1 transition-colors duration-300`}>
+          {/* Title - using native HTML with CSS limiting lines */}
+          <h3 className={`font-medium ${compact ? 'text-sm line-clamp-1' : 'text-base line-clamp-2'} text-gray-900 dark:text-white mb-1`}>
             {podcast.title}
           </h3>
           
@@ -136,7 +181,7 @@ const PodcastCard = memo(({ podcast, onClick, compact = false, priority = false 
             )}
           </div>
           
-          {/* Stats */}
+          {/* Stats - using semantic HTML */}
           <div className="flex items-center text-xs text-gray-500 dark:text-gray-500 mt-1 truncate">
             <span>{formatViews(podcast.views)} views</span>
             <span className="mx-1 opacity-60">•</span>
@@ -146,7 +191,7 @@ const PodcastCard = memo(({ podcast, onClick, compact = false, priority = false 
           </div>
         </div>
         
-        {/* Options menu */}
+        {/* Options menu - only rendered when needed */}
         {!compact && (
           <div className="relative ml-1">
             <button 
@@ -154,7 +199,7 @@ const PodcastCard = memo(({ podcast, onClick, compact = false, priority = false 
               aria-label="More options"
               onClick={(e) => {
                 e.stopPropagation();
-                // Future functionality: Show options menu
+                // Future functionality
               }}
             >
               <span className="material-icons text-gray-700 dark:text-gray-300">more_vert</span>

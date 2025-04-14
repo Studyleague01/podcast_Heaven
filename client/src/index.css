@@ -306,6 +306,53 @@
     box-shadow: 0 4px 12px -6px rgba(255, 123, 0, 0.4);
   }
   
+  /* Custom range input styling for improved appearance */
+  input[type="range"] {
+    height: 14px;
+    overflow: hidden;
+    padding: 0;
+  }
+  
+  input[type="range"]:focus {
+    outline: none;
+  }
+  
+  /* Mobile-optimized player adjustments */
+  @media (max-width: 640px) {
+    input[type="range"]::-webkit-slider-thumb {
+      width: 12px;
+      height: 12px;
+    }
+    
+    input[type="range"]::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+    }
+  }
+  
+  /* Fullscreen player background enhancements */
+  .player-backdrop {
+    background-image: radial-gradient(
+      circle at center,
+      rgba(255, 123, 0, 0.03) 0%,
+      transparent 70%
+    );
+  }
+  
+  .dark .player-backdrop {
+    background-image: radial-gradient(
+      circle at center,
+      rgba(255, 123, 0, 0.05) 0%,
+      transparent 70%
+    );
+  }
+  
+  /* Material icons optimization */
+  .material-icons {
+    font-display: block; /* Improves rendering performance */
+    text-rendering: optimizeSpeed;
+  }
+  
   /* Elegant Card Hover Effect */
   .elegant-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;

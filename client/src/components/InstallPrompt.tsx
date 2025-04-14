@@ -94,7 +94,7 @@ const InstallPrompt: React.FC = () => {
       <div className="max-w-screen-lg mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center">
           <span className="material-icons text-orange-500 mr-3 text-xl">add_to_home_screen</span>
-          <p className="text-gray-800 dark:text-gray-200">Install Cryptune on your device for quick access and offline use!</p>
+          <p className="text-gray-800 dark:text-gray-200">Install Velin on your device for quick access and offline use!</p>
         </div>
         <div className="flex space-x-3">
           <button 

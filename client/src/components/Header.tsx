@@ -61,8 +61,8 @@ const Header = memo(({ isAuthPage }: HeaderProps) => {
           >
             <span className="material-icons text-orange-500 mr-1.5 group-hover:text-orange-600 transition-colors text-2xl group-hover:animate-pulse">headphones</span>
             <h1 className="text-xl font-bold tracking-tight">
-              <span className="text-gray-900 dark:text-white transition-colors duration-300">Crypt</span>
-              <span className="text-orange-500 group-hover:text-orange-600 transition-colors">une</span>
+              <span className="text-gray-900 dark:text-white transition-colors duration-300">Vel</span>
+              <span className="text-orange-500 group-hover:text-orange-600 transition-colors">in</span>
             </h1>
           </div>
         </div>
