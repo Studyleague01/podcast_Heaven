@@ -60,7 +60,7 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
       
       try {
-        // Use the complete URL with proper error handling
+        // Use the external API directly with proper error handling
         const nextPageUrl = `https://backendmix-emergeny.vercel.app/nextpage/channel/${id}?nextpage=${encodeURIComponent(nextPageToken)}`;
         
         console.log('Fetching more episodes from:', nextPageUrl);
