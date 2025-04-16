@@ -1,7 +1,7 @@
 import { Podcast, AudioStream, Channel, SearchResponse, FeaturedResponse, NewestResponse, StreamResponse, ChannelResponse } from '@/types/podcast';
 
 // Direct API access - no server wrapper
-const EXTERNAL_API_URL = 'https://backendmix-emergeny.vercel.app';
+const EXTERNAL_API_URL = 'https://backendmix.vercel.app';
 
 // Helper function to standardize fetch requests with timeouts and error handling
 async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 8000): Promise<Response> {
@@ -77,7 +77,7 @@ export async function getAudioStream(videoId: string): Promise<StreamResponse> {
 
 export async function getVideoStream(videoId: string): Promise<StreamResponse> {
   try {
-    const response = await fetchWithTimeout(`https://backendmix.vercel.app/video/${videoId}`);
+    const response = await fetchWithTimeout(`${EXTERNAL_API_URL}/video/${videoId}`);
     return await response.json();
   } catch (error) {
     console.error('Video stream error:', error);

@@ -20,16 +20,12 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
   const [nextPageToken, setNextPageToken] = useState<string | undefined>(undefined);
   const [allEpisodes, setAllEpisodes] = useState<Podcast[]>([]);
   
-  // Get channel information directly from the API
+  // Get channel information using the channel API function
   const { data: channelData, isLoading: isChannelLoading, isError } = useQuery<ChannelResponse>({
     queryKey: [`channel-${id}`],
     queryFn: async () => {
       try {
-        const response = await fetch(`https://backendmix-emergeny.vercel.app/channel/${id}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch channel data: ${response.statusText}`);
-        }
-        const data = await response.json();
+        const data = await getChannelInfo(id);
         
         // Initialize allEpisodes when we get initial data
         if (data.relatedStreams && data.relatedStreams.length > 0) {
@@ -55,66 +51,39 @@ const ChannelView = ({ id, onPlayPodcast }: ChannelViewProps) => {
     try {
       setIsLoading(true);
       
-      // Improved error handling and fetch with timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      // Use getMoreChannelEpisodes function for consistency
+      const jsonData = await getMoreChannelEpisodes(id, nextPageToken);
+      console.log('Received pagination data:', jsonData);
       
-      try {
-        // Use the external API directly with proper error handling
-        const nextPageUrl = `https://backendmix-emergeny.vercel.app/nextpage/channel/${id}?nextpage=${encodeURIComponent(nextPageToken)}`;
-        
-        console.log('Fetching more episodes from:', nextPageUrl);
-        
-        // Make fetch request with timeout
-        const response = await fetch(nextPageUrl, {
-          signal: controller.signal,
-          headers: { 'Accept': 'application/json' }
+      // Handle empty or invalid response
+      if (!jsonData) {
+        throw new Error('Empty response from server');
+      }
+      
+      // Process the response format
+      if (jsonData.items && jsonData.items.length > 0) {
+        // Use functional update for state to avoid race conditions
+        setAllEpisodes(prev => {
+          // Filter out duplicates using Set and URL as unique identifier
+          const existingUrls = new Set(prev.map(p => p.url));
+          const newEpisodes = jsonData.items.filter((item: Podcast) => !existingUrls.has(item.url));
+          console.log(`Adding ${newEpisodes.length} new episodes`);
+          return [...prev, ...newEpisodes];
         });
         
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-          throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
-        }
-        
-        const jsonData = await response.json();
-        console.log('Received pagination data:', jsonData);
-        
-        // Handle empty or invalid response
-        if (!jsonData) {
-          throw new Error('Empty response from server');
-        }
-        
-        // Process the response format from the example
-        if (jsonData.relatedStreams && jsonData.relatedStreams.length > 0) {
-          // Use functional update for state to avoid race conditions
-          setAllEpisodes(prev => {
-            // Filter out duplicates using Set and URL as unique identifier
-            const existingUrls = new Set(prev.map(p => p.url));
-            const newEpisodes = jsonData.relatedStreams.filter((item: Podcast) => !existingUrls.has(item.url));
-            console.log(`Adding ${newEpisodes.length} new episodes`);
-            return [...prev, ...newEpisodes];
-          });
-          
-          // Update the next page token if available
-          if (jsonData.nextpage) {
-            console.log('Setting next page token:', jsonData.nextpage);
-            setNextPageToken(jsonData.nextpage);
-          } else {
-            // No more pages
-            console.log('No more pages available');
-            setNextPageToken(undefined);
-          }
+        // Update the next page token if available
+        if (jsonData.nextpage) {
+          console.log('Setting next page token:', jsonData.nextpage);
+          setNextPageToken(jsonData.nextpage);
         } else {
-          console.log('No related streams found in the response');
-          // No more items
+          // No more pages
+          console.log('No more pages available');
           setNextPageToken(undefined);
         }
-      } catch (fetchError: unknown) {
-        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-          throw new Error('Request timed out. Please try again.');
-        }
-        throw fetchError;
+      } else {
+        console.log('No more episodes found');
+        // No more items
+        setNextPageToken(undefined);
       }
     } catch (err: unknown) {
       console.error('Error loading more episodes:', err);

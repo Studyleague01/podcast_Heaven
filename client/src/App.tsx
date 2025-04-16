@@ -112,7 +112,7 @@ const AppContent = () => {
     const videoId = extractVideoIdFromUrl(podcast.url);
     if (videoId) {
       // Fetch video stream from the API
-      fetch(`https://backendmix.vercel.app/video/${videoId}`)
+      fetch(`${import.meta.env.VITE_API_URL || 'https://backendmix.vercel.app'}/video/${videoId}`)
         .then(response => response.json())
         .then(data => {
           if (data.status === "success" && data.url) {

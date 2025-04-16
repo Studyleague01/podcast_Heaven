@@ -6,7 +6,7 @@ import path from "path";
 import { storage } from "./storage";
 import { log } from "./vite";
 
-const BASE_URL = "https://backendmix-emergeny.vercel.app";
+const BASE_URL = "https://backendmix.vercel.app";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Handle the create.html route
