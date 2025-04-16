@@ -456,46 +456,26 @@ const AudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onShare }:
               <div className="w-full max-w-md px-4 mt-auto flex-shrink-0">
                 {/* Improved Progress Controls */}
                 <div className="w-full mb-8">
-                  {/* Streamlined modern progress bar */}
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max={duration || 100} 
-                    value={currentTime}
-                    step="0.1"
-                    className="w-full h-1.5 cursor-pointer smooth-transition accent-orange-500 appearance-none bg-gray-200 dark:bg-zinc-700 rounded-full"
-                    onChange={(e) => {
-                      const newTime = parseFloat(e.target.value);
-                      setCurrentTime(newTime);
-                      
-                      // Update audio time
-                      if (audioRef.current) {
-                        audioRef.current.currentTime = newTime;
-                      }
-                      
-                      // Also update video time if in video mode
-                      if (isVideoMode && videoRef.current) {
-                        videoRef.current.currentTime = newTime;
-                      }
-                      
-                      // Make sure both are in sync
-                      if (isVideoMode && videoRef.current && audioRef.current) {
-                        const diff = Math.abs(videoRef.current.currentTime - audioRef.current.currentTime);
-                        if (diff > 0.2) {
-                          videoRef.current.currentTime = audioRef.current.currentTime;
-                        }
-                      }
-                    }}
-                    ref={expandedProgressBarRef as React.RefObject<HTMLInputElement>}
-                    style={{
-                      background: `linear-gradient(to right, #f97316 ${(currentTime / (duration || 1)) * 100}%, ${
-                        document.documentElement.classList.contains('dark') ? '#3f3f46' : '#e5e7eb'
-                      } ${(currentTime / (duration || 1)) * 100}%)`
-                    }}
-                  />
+                  {/* Minimal modern progress bar */}
+                  <div className="relative w-full h-8 flex items-center cursor-pointer group" 
+                    onClick={handleExpandedProgressBarClick}
+                    ref={expandedProgressBarRef}>
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="h-1 w-full bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-orange-500 rounded-full transition-all" 
+                          style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div 
+                      className="absolute h-3 w-3 rounded-full bg-orange-500 shadow-md transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ left: `${(currentTime / (duration || 1)) * 100}%` }}
+                    ></div>
+                  </div>
                   
-                  {/* Time indicators with Better Layout */}
-                  <div className="flex justify-between text-gray-500 dark:text-gray-400 mt-3 text-sm font-medium">
+                  {/* Clean minimal time indicators */}
+                  <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs font-medium">
                     <span>{formatDuration(currentTime)}</span>
                     <span>-{formatDuration(duration - currentTime)}</span>
                   </div>
@@ -563,50 +543,67 @@ const AudioPlayer = ({ podcast, audioStream, isPlaying, onTogglePlay, onShare }:
                   </button>
                 </div>
                 
-                {/* Volume Slider with modern styling */}
+                {/* Minimal volume control */}
                 <div className="w-full max-w-xs mx-auto flex items-center space-x-3 mb-4">
                   <button 
                     onClick={toggleMute}
-                    className="p-1 rounded-full hover:bg-gray-100/60 dark:hover:bg-zinc-800/60 transition-colors"
+                    className="p-2 rounded-full hover:bg-gray-100/60 dark:hover:bg-zinc-800/60 transition-colors text-gray-500 dark:text-gray-400"
                   >
                     {isMuted ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 dark:text-gray-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
                         <line x1="23" y1="9" x2="17" y2="15"></line>
                         <line x1="17" y1="9" x2="23" y2="15"></line>
                       </svg>
                     ) : volume < 0.3 ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 dark:text-gray-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
                         <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
                       </svg>
                     ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 dark:text-gray-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
                         <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
                         <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
                       </svg>
                     )}
                   </button>
-                  <div className="w-full bg-gray-200/70 dark:bg-zinc-700/70 h-1.5 rounded-full overflow-hidden backdrop-blur-sm">
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max="1" 
-                      step="0.01"
-                      value={isMuted ? 0 : volume}
-                      onChange={(e) => {
-                        const newVolume = parseFloat(e.target.value);
+                  <div className="relative w-full h-6 flex items-center cursor-pointer group"
+                    ref={volumeSliderRef}
+                    onClick={(e) => {
+                      // Calculate new volume based on click position
+                      if (volumeSliderRef.current) {
+                        const rect = volumeSliderRef.current.getBoundingClientRect();
+                        const pos = (e.clientX - rect.left) / rect.width;
+                        const newVolume = Math.max(0, Math.min(pos, 1));
+                        
+                        // Update volume
                         setVolume(newVolume);
+                        
+                        // Unmute if muted and setting volume > 0
                         if (newVolume > 0 && isMuted) {
                           toggleMute();
                         }
-                      }}
-                      className="w-full h-1.5 accent-orange-500 appearance-none rounded-full bg-transparent relative z-10"
-                      style={{
-                        background: `linear-gradient(to right, #f97316 ${(isMuted ? 0 : volume) * 100}%, transparent ${(isMuted ? 0 : volume) * 100}%)`
-                      }}
-                    />
+                        
+                        // Update audio element volume
+                        if (audioRef.current) {
+                          audioRef.current.volume = isMuted ? 0 : newVolume;
+                        }
+                      }
+                    }}
+                  >
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="h-1 w-full bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-orange-500 rounded-full transition-all" 
+                          style={{ width: `${(isMuted ? 0 : volume) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div 
+                      className="absolute h-3 w-3 rounded-full bg-orange-500 shadow-md transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ left: `${(isMuted ? 0 : volume) * 100}%` }}
+                    ></div>
                   </div>
                 </div>
               </div>
