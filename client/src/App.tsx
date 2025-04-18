@@ -1,26 +1,26 @@
 import { Switch, Route, useLocation, useParams } from "wouter";
-import { Toaster } from "@/components/ui/toaster";
-import Header from "@/components/Header";
-import AudioPlayer from "@/components/AudioPlayer";
-import DirectSharePopup from "@/components/DirectSharePopup";
-import InstallPrompt from "@/components/InstallPrompt";
-import UpdatePrompt from "@/components/UpdatePrompt";
-import OfflineFallback from "@/components/OfflineFallback";
-import Home from "@/pages/Home";
-import PodcastDetail from "@/pages/PodcastDetail";
-import ChannelView from "@/pages/ChannelView";
-import SearchResults from "@/pages/SearchResults";
-import Auth from "@/pages/Auth";
-import NotFound from "@/pages/not-found";
-import CreatePage from "@/pages/CreatePage";
+import { Toaster } from "./components/ui/toaster";
+import Header from "./components/Header";
+import AudioPlayer from "./components/AudioPlayer";
+import DirectSharePopup from "./components/DirectSharePopup";
+import InstallPrompt from "./components/InstallPrompt";
+import UpdatePrompt from "./components/UpdatePrompt";
+import OfflineFallback from "./components/OfflineFallback";
+import Home from "./pages/Home";
+import PodcastDetail from "./pages/PodcastDetail";
+import ChannelView from "./pages/ChannelView";
+import SearchResults from "./pages/SearchResults";
+import Auth from "./pages/Auth";
+import NotFound from "./pages/not-found";
+import CreatePage from "./pages/CreatePage";
 
 import { useState, useEffect, useContext, useCallback, lazy, Suspense } from "react";
-import { Podcast, AudioStream, VideoStream } from "@/types/podcast";
-import { useAudioPlayerStore, useSearchStore, useAuthStore } from "@/store/index";
-import { getVideoStream, extractVideoIdFromUrl } from "@/api/podcast";
-import { useShareStore } from "@/lib/useShare";
-import { NetworkContext, NetworkProvider } from "@/contexts/NetworkContext";
-import LoadingIndicator from "@/components/LoadingIndicator";
+import { Podcast, AudioStream, VideoStream } from "./types/podcast";
+import { useAudioPlayerStore, useSearchStore, useAuthStore } from "./store/index";
+import { getVideoStream, extractVideoIdFromUrl } from "./api/podcast";
+import { useShareStore } from "./lib/useShare";
+import { NetworkContext, NetworkProvider } from "./contexts/NetworkContext";
+import LoadingIndicator from "./components/LoadingIndicator";
 
 // Route components using improved props passing and memoization
 const HomeRoute = ({ onPlayPodcast }: { onPlayPodcast: (podcast: Podcast, stream: AudioStream) => void }) => {
@@ -50,13 +50,24 @@ const AppContent = () => {
   const [audioStream, setAudioStream] = useState<AudioStream | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const { searchQuery } = useSearchStore();
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   
   // Use our global share store
   const { sharePodcast } = useShareStore();
   
   // Access the player state to load from it if needed
   const playerStore = useAudioPlayerStore();
+  
+  // Expose navigation function for external scripts (like redirect.js)
+  useEffect(() => {
+    window.navigateTo = (path: string) => {
+      navigate(path);
+    };
+    
+    return () => {
+      delete window.navigateTo;
+    };
+  }, [navigate]);
   
   // Show offline fallback when not connected to the internet
   if (!isOnline) {
@@ -74,7 +85,6 @@ const AppContent = () => {
   }, [playerStore, currentPodcast]);
 
   // Handle URL sharing parameters
-  const [, setLocation] = useLocation();
   
   useEffect(() => {
     try {
@@ -84,12 +94,12 @@ const AppContent = () => {
       
       if (shareId) {
         // If we have a share ID, navigate to the correct content
-        setLocation(`/podcast/${shareId}`);
+        navigate(`/podcast/${shareId}`);
       }
     } catch (error) {
       console.error('Error processing URL parameters:', error);
     }
-  }, [setLocation]);
+  }, [navigate]);
 
   // Memoize the play podcast handler for performance
   const handlePlayPodcast = useCallback((podcast: Podcast, stream: AudioStream) => {
@@ -111,9 +121,8 @@ const AppContent = () => {
     // Fetch video stream in the background if available
     const videoId = extractVideoIdFromUrl(podcast.url);
     if (videoId) {
-      // Fetch video stream from the API
-      fetch(`${import.meta.env.VITE_API_URL || 'https://backendmix.vercel.app'}/video/${videoId}`)
-        .then(response => response.json())
+      // Fetch video stream directly from the API using our helper function
+      getVideoStream(videoId)
         .then(data => {
           if (data.status === "success" && data.url) {
             // Create a VideoStream object from the API response
@@ -152,9 +161,9 @@ const AppContent = () => {
   useEffect(() => {
     const publicPaths = ['/auth'];
     if (!isAuthenticated && !publicPaths.includes(location)) {
-      setLocation('/auth');
+      navigate('/auth');
     }
-  }, [isAuthenticated, location, setLocation]);
+  }, [isAuthenticated, location, navigate]);
   
   // Check if the user is on the auth page
   const isAuthPage = location === '/auth';

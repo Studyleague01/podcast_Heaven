@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
-import { Podcast, AudioStream, VideoStream } from "@/types/podcast";
-import { formatDuration, getYouTubeThumbnail, extractVideoIdFromUrl } from "@/api/podcast";
-import { useAudioPlayerStore } from "@/store/index";
+import { Podcast, AudioStream, VideoStream } from "../types/podcast";
+import { formatDuration, getYouTubeThumbnail, extractVideoIdFromUrl } from "../api/podcast";
+import { useAudioPlayerStore } from "../store/index";
 
 interface LightAudioPlayerProps {
   podcast: Podcast;

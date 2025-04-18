@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Podcast } from '@/types/podcast';
+import { Podcast } from '../types/podcast';
 
 export interface ShareContent {
   title: string;

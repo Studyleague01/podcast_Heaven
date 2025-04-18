@@ -1,5 +1,5 @@
 // Authentication API for direct client access
-const AUTH_API_URL = 'https://backendmix.vercel.app';
+const AUTH_API_URL = 'https://vercel-auth-delta.vercel.app';
 
 // Interfaces for request/response types
 export interface AuthRequest {

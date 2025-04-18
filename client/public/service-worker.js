@@ -79,11 +79,36 @@ registerRoute(
 
 // Set up navigation routes to always go through index.html
 // This is needed for SPA with client-side routing
+const indexFallbackHandler = createHandlerBoundToURL('/index.html');
 registerRoute(
-  // Check to see if the request is a navigation
-  ({ request }) => request.mode === 'navigate',
-  // Use a network-first strategy for HTML pages
-  new StaleWhileRevalidate({
+  // Check for all navigation requests:
+  // - Standard routes like /auth, /search, etc.
+  // - Deep-linked routes that should be handled client-side
+  ({ request, url }) => {
+    // Check if this is a navigation request
+    if (request.mode !== 'navigate') {
+      return false;
+    }
+    
+    // Define client-side routes to capture
+    const clientRoutes = [
+      // Basic routes
+      /^\/?$/,              // home
+      /^\/auth\/?$/,        // authentication
+      /^\/create\/?$/,      // create page
+      
+      // Parameterized routes
+      /^\/search\/[^/]+\/?$/,     // search results
+      /^\/podcast\/[^/]+\/?$/,    // podcast details
+      /^\/channel\/[^/]+\/?$/     // channel view
+    ];
+    
+    // Check if the current URL path matches any of our client routes
+    const path = new URL(url).pathname;
+    return clientRoutes.some(route => route.test(path));
+  },
+  // Use a network-first strategy for HTML pages with fallback to index.html
+  new NetworkFirst({
     cacheName: 'pages-cache',
     plugins: [
       new ExpirationPlugin({
@@ -91,7 +116,21 @@ registerRoute(
         maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
       }),
     ],
+    networkTimeoutSeconds: 5, // Timeout if network takes too long
+    matchOptions: {
+      ignoreSearch: true     // Ignore query parameters
+    },
+    // Fall back to the cached index.html if network request fails
+    // This ensures client-side routing works offline
+    fallbackToNetwork: false
   })
+);
+
+// For any other navigation requests not matched by the above routes,
+// fall back to index.html to allow client-side routing to handle it
+registerRoute(
+  ({ request }) => request.mode === 'navigate',
+  indexFallbackHandler
 );
 
 // This allows the web app to trigger skipWaiting via

@@ -1,9 +1,9 @@
 import { useRef, useEffect, RefObject } from "react";
-import { Podcast, AudioStream, VideoStream } from "@/types/podcast";
-import { formatDuration, getYouTubeThumbnail, extractVideoIdFromUrl } from "@/api/podcast";
-import { useAudioPlayerStore } from "@/store/index";
-import { useAudioPlayer } from "@/hooks/useAudioPlayer";
-import { cn } from "@/lib/utils";
+import { Podcast, AudioStream, VideoStream } from "../types/podcast";
+import { formatDuration, getYouTubeThumbnail, extractVideoIdFromUrl } from "../api/podcast";
+import { useAudioPlayerStore } from "../store/index";
+import { useAudioPlayer } from "../hooks/useAudioPlayer";
+import { cn } from "../lib/utils";
 
 interface AudioPlayerProps {
   podcast: Podcast;

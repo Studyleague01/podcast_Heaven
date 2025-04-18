@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, memo } from "react";
-import { useSearchStore } from "@/store/index";
+import { useSearchStore } from "../store/index";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;

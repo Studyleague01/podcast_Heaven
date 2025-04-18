@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from './ui/button';
 import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { useThemeStore, getEffectiveTheme } from '@/store/themeStore';
+} from './ui/dropdown-menu';
+import { useThemeStore, getEffectiveTheme } from '../store/themeStore';
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useThemeStore();

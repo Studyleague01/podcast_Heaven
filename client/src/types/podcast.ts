@@ -45,6 +45,10 @@ export interface StreamResponse {
   duration: number;
   audioStreams: AudioStream[];
   videoStreams?: VideoStream[];
+  // Additional properties for direct API responses
+  status?: string;
+  url?: string;
+  quality?: string;
 }
 
 export interface SearchResponse {

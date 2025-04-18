@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getFeaturedPodcasts, getNewestPodcasts, searchPodcasts, getAudioStream } from "@/api/podcast";
-import PodcastCard from "@/components/PodcastCard";
-import LoadingIndicator from "@/components/LoadingIndicator";
-import ErrorMessage from "@/components/ErrorMessage";
-import FeaturedCreators from "@/components/FeaturedCreators";
-import { useSearchStore, useAuthStore } from "@/store/index";
-import { Podcast, AudioStream } from "@/types/podcast";
-import { extractVideoIdFromUrl } from "@/api/podcast";
-import { cn } from "@/lib/utils";
+import { getFeaturedPodcasts, getNewestPodcasts, searchPodcasts, getAudioStream } from "../api/podcast";
+import PodcastCard from "../components/PodcastCard";
+import LoadingIndicator from "../components/LoadingIndicator";
+import ErrorMessage from "../components/ErrorMessage";
+import FeaturedCreators from "../components/FeaturedCreators";
+import { useSearchStore, useAuthStore } from "../store/index";
+import { Podcast, AudioStream } from "../types/podcast";
+import { extractVideoIdFromUrl } from "../api/podcast";
+import { cn } from "../lib/utils";
 
 interface HomeProps {
   onPlayPodcast: (podcast: Podcast, stream: AudioStream) => void;

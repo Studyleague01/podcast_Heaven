@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
-import { useShareStore } from "@/lib/useShare";
+import { cn } from "../lib/utils";
+import { Input } from "./ui/input";
+import { toast } from "../hooks/use-toast";
+import { useShareStore } from "../lib/useShare";
 
 const DirectSharePopup = () => {
   // Use our Zustand store directly

@@ -1,12 +1,12 @@
-import { useAuthStore } from "@/store/index";
-import { useThemeStore } from "@/store/themeStore";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { toast } from "@/hooks/use-toast";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuthStore } from "../store/index";
+import { useThemeStore } from "../store/themeStore";
+import { Button } from "./ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { toast } from "../hooks/use-toast";
+import { useIsMobile } from "../hooks/use-mobile";
 import { useLocation } from "wouter";
-import { useShare } from "@/lib/useShare";
+import { useShare } from "../lib/useShare";
 
 interface UserProfileProps {
   showThemeToggle?: boolean;

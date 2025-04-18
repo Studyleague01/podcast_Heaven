@@ -1,7 +1,7 @@
-import { Podcast, AudioStream, Channel, SearchResponse, FeaturedResponse, NewestResponse, StreamResponse, ChannelResponse } from '@/types/podcast';
+import { Podcast, AudioStream, Channel, SearchResponse, FeaturedResponse, NewestResponse, StreamResponse, ChannelResponse } from '../types/podcast';
 
 // Direct API access - no server wrapper
-const EXTERNAL_API_URL = 'https://backendmix.vercel.app';
+const API_URL = 'https://backendmix.vercel.app';
 
 // Helper function to standardize fetch requests with timeouts and error handling
 async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 8000): Promise<Response> {
@@ -36,7 +36,7 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutM
 export async function searchPodcasts(query: string): Promise<SearchResponse> {
   try {
     const response = await fetchWithTimeout(
-      `${EXTERNAL_API_URL}/search?q=${encodeURIComponent(query)}`
+      `${API_URL}/search?q=${encodeURIComponent(query)}`
     );
     return await response.json();
   } catch (error) {
@@ -47,7 +47,7 @@ export async function searchPodcasts(query: string): Promise<SearchResponse> {
 
 export async function getFeaturedPodcasts(): Promise<FeaturedResponse> {
   try {
-    const response = await fetchWithTimeout(`${EXTERNAL_API_URL}/featured`);
+    const response = await fetchWithTimeout(`${API_URL}/featured`);
     return await response.json();
   } catch (error) {
     console.error('Featured podcasts error:', error);
@@ -57,7 +57,7 @@ export async function getFeaturedPodcasts(): Promise<FeaturedResponse> {
 
 export async function getNewestPodcasts(): Promise<NewestResponse> {
   try {
-    const response = await fetchWithTimeout(`${EXTERNAL_API_URL}/newest`);
+    const response = await fetchWithTimeout(`${API_URL}/newest`);
     return await response.json();
   } catch (error) {
     console.error('Newest podcasts error:', error);
@@ -67,7 +67,7 @@ export async function getNewestPodcasts(): Promise<NewestResponse> {
 
 export async function getAudioStream(videoId: string): Promise<StreamResponse> {
   try {
-    const response = await fetchWithTimeout(`${EXTERNAL_API_URL}/streams/${videoId}`);
+    const response = await fetchWithTimeout(`${API_URL}/streams/${videoId}`);
     return await response.json();
   } catch (error) {
     console.error('Audio stream error:', error);
@@ -77,7 +77,7 @@ export async function getAudioStream(videoId: string): Promise<StreamResponse> {
 
 export async function getVideoStream(videoId: string): Promise<StreamResponse> {
   try {
-    const response = await fetchWithTimeout(`${EXTERNAL_API_URL}/video/${videoId}`);
+    const response = await fetchWithTimeout(`${API_URL}/video/${videoId}`);
     return await response.json();
   } catch (error) {
     console.error('Video stream error:', error);
@@ -87,7 +87,7 @@ export async function getVideoStream(videoId: string): Promise<StreamResponse> {
 
 export async function getChannelInfo(channelId: string): Promise<ChannelResponse> {
   try {
-    const response = await fetchWithTimeout(`${EXTERNAL_API_URL}/channel/${channelId}`);
+    const response = await fetchWithTimeout(`${API_URL}/channel/${channelId}`);
     return await response.json();
   } catch (error) {
     console.error('Channel info error:', error);
@@ -98,7 +98,7 @@ export async function getChannelInfo(channelId: string): Promise<ChannelResponse
 export async function getMoreChannelEpisodes(channelId: string, nextPageToken: string): Promise<SearchResponse> {
   try {
     const response = await fetchWithTimeout(
-      `${EXTERNAL_API_URL}/nextpage/channel/${channelId}?nextpage=${encodeURIComponent(nextPageToken)}`
+      `${API_URL}/nextpage/channel/${channelId}?nextpage=${encodeURIComponent(nextPageToken)}`
     );
     return await response.json();
   } catch (error) {

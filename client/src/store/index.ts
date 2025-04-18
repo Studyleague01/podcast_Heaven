@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Podcast, AudioStream, VideoStream } from '@/types/podcast';
+import { Podcast, AudioStream, VideoStream } from '../types/podcast';
 
 interface AudioPlayerState {
   currentPodcast: Podcast | null;

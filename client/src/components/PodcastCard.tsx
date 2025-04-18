@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
-import { Podcast } from "@/types/podcast";
-import { extractVideoIdFromUrl, formatDuration, formatViews, getYouTubeThumbnail } from "@/api/podcast";
+import { Podcast } from "../types/podcast";
+import { extractVideoIdFromUrl, formatDuration, formatViews, getYouTubeThumbnail } from "../api/podcast";
 import React, { memo, useCallback, useState, useRef, useEffect, useMemo } from "react";
 
 interface PodcastCardProps {

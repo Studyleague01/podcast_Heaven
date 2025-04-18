@@ -2,9 +2,9 @@ import { useState, useCallback, memo } from "react";
 import { useLocation } from "wouter";
 import SearchBar from "./SearchBar";
 import UserProfile from "./UserProfile";
-import { useSearchStore, useAuthStore } from "@/store/index";
-import { useShareStore } from "@/lib/useShare";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useSearchStore, useAuthStore } from "../store/index";
+import { useShareStore } from "../lib/useShare";
+import { useIsMobile } from "../hooks/use-mobile";
 
 interface HeaderProps {
   isAuthPage?: boolean;
