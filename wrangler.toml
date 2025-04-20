@@ -1,4 +1,4 @@
-name = "rest-express"
+name = "tatti-express"
 type = "javascript"
 account_id = "9f59889bd7648271ab70330290195c0c"
 workers_dev = true
