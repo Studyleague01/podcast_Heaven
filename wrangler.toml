@@ -1,0 +1,11 @@
+name = "rest-express"
+type = "javascript"
+account_id = "9f59889bd7648271ab70330290195c0c"
+workers_dev = true
+compatibility_date = "2025-04-20"
+
+[build]
+command = "npm run build"
+upload.format = "modules"
+upload.dir = "./dist"
+main = "index.js"
